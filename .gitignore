@@ -1,0 +1,43 @@
+# secrets
+.env
+.env.*
+secrets/
+*serviceAccount*.json
+*-adminsdk-*.json
+*.pem
+*.key
+
+# curriculum material: never in the public repo
+*.pdf
+input_pdfs/
+work/
+curriculum-draft.json
+firestore-plan.json
+table-report.json
+source.txt
+manifest.json
+review.html
+batch-report.json
+import-commands.txt
+survey.txt
+.venv/
+__pycache__/
+# build and dependencies
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor and system files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

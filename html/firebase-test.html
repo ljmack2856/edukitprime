@@ -1,0 +1,66 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edullumia Firebase Test</title>
+</head>
+
+<body>
+
+    <h1>Edullumia Firebase Test</h1>
+
+    <p id="status">Checking Firebase...</p>
+
+    <hr>
+
+    <h2>Email/Password Test</h2>
+
+    <input
+        type="email"
+        id="email"
+        placeholder="Test email"
+    >
+
+    <br><br>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Test password"
+    >
+
+    <br><br>
+
+    <button id="signupBtn">Create Test Account</button>
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn">Logout</button>
+
+    <hr>
+
+    <h2>Google Test</h2>
+
+    <button id="googleBtn">Continue with Google</button>
+
+    <hr>
+
+    <h2>Teacher Profile Test</h2>
+
+    <p>
+        Sign in first, then use this button to create a test
+        teacher profile for the currently signed-in account.
+    </p>
+
+    <button id="createTeacherProfileBtn">
+        Create Test Teacher Profile
+    </button>
+
+    <p id="message" role="status" aria-live="polite"></p>
+
+    <script type="module" src="/js/auth.js"></script>
+
+</body>
+</html>
+

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="t d">
+<title id="t">EduKitPrime logo</title><desc id="d">Abstract open-book and P emblem with EduKitPrime wordmark.</desc>
+<g transform="translate(42 35)">
+<path d="M178 38C112 38 76 78 76 129c0 27 11 48 32 66-31-10-62-9-90 7v34c45-22 87-14 133 21 2-36 21-60 55-80 31-18 44-45 44-74 0-37-28-65-72-65Z" fill="#242320"/>
+<path d="M18 202c49-15 93 5 133 55-10-39-32-69-68-88-25-13-48-18-72-16v27c26 0 50 9 72 24" fill="#D88A32"/>
+<path d="M151 257c4-41 26-66 60-83 28-14 43-38 43-66 0-17-5-32-15-44-1 44-20 66-48 81-26 14-42 38-40 71-15-17-34-32-55-41 25 18 44 46 55 82Z" fill="#B56A32"/>
+<path d="M18 236c45-20 87-11 133 21-34 4-63 13-90 32-15-10-30-22-43-39Z" fill="#242320"/>
+<path d="M270 23l7 20 21 7-21 7-7 21-7-21-21-7 21-7Z" fill="#D6B878"/>
+</g>
+<g font-family="Inter,Arial,sans-serif"><text x="365" y="204" font-size="116" font-weight="700" letter-spacing="-5" fill="#242320">EduKit</text><text x="746" y="204" font-size="116" font-weight="700" letter-spacing="-5" fill="#B56A32">Prime</text>
+<path d="M755 96c75-69 215-68 295-8" fill="none" stroke="#D6B878" stroke-width="5" stroke-linecap="round"/>
+<text x="372" y="264" font-size="24" font-weight="500" letter-spacing="10" fill="#77736C">TEACH  •  PLAN  •  INSPIRE</text></g></svg>

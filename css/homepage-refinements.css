@@ -1,0 +1,236 @@
+/* =========================================================
+   EDUKITPRIME HOMEPAGE REFINEMENTS
+   Loaded after style.css. Shared site styles remain untouched.
+   ========================================================= */
+
+/* Resource discovery: focus attention on the resource available now. */
+#resources .section-heading {
+    align-items: center;
+    margin-bottom: 48px;
+}
+#resources .section-heading h2 { margin-top: 0; }
+#resources .resource-grid {
+    grid-template-columns: minmax(0, 560px);
+    justify-content: start;
+}
+#resources .resource-card {
+    min-height: 275px;
+    padding: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    background: linear-gradient(135deg, #F7F5F0 0%, #F1EBDD 100%);
+}
+#resources .resource-card-icon { margin-bottom: 28px; }
+#resources .resource-card-link { margin-top: auto; padding-top: 22px; }
+
+/* Features 17 adaptation: three connected stages with a shared sunrise motif. */
+.features-section { overflow: hidden; }
+.features-intro { max-width: 760px; }
+.features-intro h2 {
+    max-width: 720px;
+    margin-top: 0;
+    font-size: clamp(34px, 4vw, 51px);
+    line-height: 1.12;
+    letter-spacing: -2px;
+}
+.features-intro p { max-width: 560px; margin-top: 20px; }
+.features-grid.features-horizon {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+    margin-top: 55px;
+}
+.feature-card {
+    position: relative;
+    min-height: 365px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 27px 25px 118px;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid rgba(120, 105, 78, 0.15);
+    border-radius: 17px;
+    background: #FBFAF7;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(181, 106, 50, 0.35);
+    box-shadow: 0 18px 42px rgba(36, 35, 32, 0.07);
+}
+.horizon-stage-one { background: #F8F4EA; }
+.horizon-stage-two { background: #F2EEE5; }
+.horizon-stage-three { background: #F7F2E9; }
+.feature-card-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+.feature-index {
+    max-width: 190px;
+    color: #9B7650;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 1.1px;
+}
+.feature-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(181, 106, 50, 0.2);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.68);
+    color: #A96332;
+}
+.feature-icon svg { width: 27px; height: 27px; }
+.feature-card-copy {
+    position: relative;
+    z-index: 2;
+    max-width: 360px;
+    margin-top: 42px;
+}
+.feature-card-copy h3 {
+    color: #292721;
+    font-size: clamp(18px, 1.8vw, 22px);
+    line-height: 1.28;
+    letter-spacing: -0.5px;
+    font-weight: 600;
+}
+.feature-card-copy p {
+    margin-top: 12px;
+    color: #77736C;
+    font-size: 11.5px;
+    line-height: 1.85;
+}
+.feature-horizon-art {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 112px;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 0%, rgba(214, 184, 120, 0.09) 100%);
+}
+.feature-horizon-art::before {
+    content: "";
+    position: absolute;
+    right: -12%;
+    bottom: -83px;
+    left: -12%;
+    height: 130px;
+    border: 1px solid rgba(181, 106, 50, 0.35);
+    border-radius: 50% 50% 0 0;
+    background: linear-gradient(180deg, rgba(214, 184, 120, 0.15), rgba(181, 106, 50, 0.025));
+}
+.feature-horizon-art::after {
+    content: "";
+    position: absolute;
+    right: -8%;
+    bottom: -100px;
+    left: -8%;
+    height: 145px;
+    border-top: 1px solid rgba(181, 106, 50, 0.22);
+    border-radius: 50% 50% 0 0;
+}
+.horizon-sun {
+    position: absolute;
+    right: 22%;
+    bottom: 30px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 35%, #F4DDA7 0%, #D6B878 58%, rgba(181, 106, 50, 0.65) 100%);
+    box-shadow: 0 0 0 12px rgba(214, 184, 120, 0.10), 0 0 35px rgba(214, 184, 120, 0.25);
+}
+.horizon-orbit {
+    position: absolute;
+    right: 12%;
+    bottom: 4px;
+    width: 130px;
+    height: 76px;
+    border: 1px dashed rgba(181, 106, 50, 0.32);
+    border-bottom: 0;
+    border-radius: 100px 100px 0 0;
+}
+.horizon-line {
+    position: absolute;
+    right: 0;
+    bottom: 29px;
+    left: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(181, 106, 50, 0.36), transparent);
+}
+.horizon-stage-two .horizon-sun { right: 39%; bottom: 23px; background: radial-gradient(circle at 38% 35%, #F7E9C7 0%, #D6B878 62%, #B56A32 100%); }
+.horizon-stage-two .horizon-orbit { right: 29%; transform: scale(1.08); }
+.horizon-stage-three .horizon-sun { right: 18%; bottom: 35px; background: radial-gradient(circle at 38% 35%, #F1D6B0 0%, #C98C5B 64%, #A95548 100%); }
+.horizon-stage-three .horizon-orbit { right: 8%; transform: rotate(-8deg); }
+
+/* How it works: four clear steps and a teacher-centred note. */
+.how-heading h2 { max-width: 760px; margin: 0 auto; }
+.how-heading p { max-width: 520px; margin: 15px auto 0; line-height: 1.8; }
+.steps-grid.steps-grid-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 52px;
+}
+.steps-grid-four .step-card {
+    min-height: 235px;
+    padding: 25px 22px;
+    background: #FFFEFC;
+}
+.steps-grid-four .step-card h3 { font-size: 15px; line-height: 1.4; }
+.steps-grid-four .step-card p { font-size: 12px; }
+.how-note {
+    max-width: 720px;
+    margin: 27px auto 0;
+    color: #77736C;
+    font-size: 11px;
+    line-height: 1.8;
+    text-align: center;
+}
+.cta-content h2 {
+    margin-top: 0;
+    font-size: clamp(34px, 4.3vw, 52px);
+    letter-spacing: -1.8px;
+}
+.dropdown-content-single { grid-template-columns: 1fr; padding-bottom: 18px; }
+
+@media (max-width: 1100px) {
+    .features-grid.features-horizon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .horizon-stage-three { grid-column: 1 / -1; }
+    .steps-grid.steps-grid-four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+    #resources .section-heading { display: block; margin-bottom: 35px; }
+    #resources .section-heading > p { margin-top: 18px; }
+    #resources .resource-grid { grid-template-columns: 1fr; }
+    #resources .resource-card { min-height: 265px; padding: 26px; }
+    .features-intro h2 { font-size: clamp(31px, 8vw, 42px); letter-spacing: -1.4px; }
+    .features-grid.features-horizon { grid-template-columns: 1fr; gap: 14px; margin-top: 38px; }
+    .feature-card, .horizon-stage-three { grid-column: 1; min-height: 330px; padding: 24px 24px 112px; }
+    .feature-card-copy { max-width: 100%; margin-top: 36px; }
+    .feature-card-copy h3 { max-width: 330px; font-size: 21px; }
+    .feature-card-copy p { max-width: 380px; }
+    .steps-grid.steps-grid-four { grid-template-columns: 1fr; gap: 12px; margin-top: 38px; }
+    .steps-grid-four .step-card { min-height: auto; padding: 23px; }
+    .steps-grid-four .step-card h3 { margin-top: 18px; }
+    .cta-content h2 { font-size: clamp(33px, 8vw, 43px); letter-spacing: -1.3px; }
+}
+@media (max-width: 400px) {
+    #resources .resource-card { padding: 23px; }
+    .feature-card, .horizon-stage-three { min-height: 345px; padding-right: 21px; padding-left: 21px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .feature-card, .feature-card:hover { transition: none; transform: none; }
+}

@@ -1,0 +1,2912 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Scheme builder demo v9</title>
+    <style>
+      :root {
+        --bg: #f6f6f4;
+        --fg: #1b1b1b;
+        --card: #fff;
+        --line: #d8d8d2;
+        --mut: #5a5a55;
+        --acc: #0b6b4f;
+        --warn: #fff3cd;
+        --warnl: #e6c34a;
+        color-scheme: light;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #161615;
+          --fg: #ececea;
+          --card: #201f1e;
+          --line: #3a3936;
+          --mut: #a5a49d;
+          --acc: #4fc79e;
+          --warn: #3a3217;
+          --warnl: #7a6720;
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg: #161615;
+        --fg: #ececea;
+        --card: #201f1e;
+        --line: #3a3936;
+        --mut: #a5a49d;
+        --acc: #4fc79e;
+        --warn: #3a3217;
+        --warnl: #7a6720;
+        color-scheme: dark;
+      }
+      html {
+        scroll-padding-top: env(safe-area-inset-top, 0px);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          15px/1.45 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 6px 0;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      h3 {
+        font-size: 14px;
+        margin: 10px 0 4px;
+      }
+      .mut {
+        color: var(--mut);
+        font-size: 13px;
+      }
+      .sm {
+        font-size: 11px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        margin: 0 0 12px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: end;
+        margin: 0 0 8px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        color: var(--mut);
+        gap: 3px;
+      }
+      select,
+      input,
+      button {
+        font: inherit;
+        padding: 7px 9px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--fg);
+      }
+      input[type="number"] {
+        width: 64px;
+      }
+      input.pg {
+        width: 84px;
+      }
+      input[type="checkbox"] {
+        width: auto;
+      }
+      button {
+        cursor: pointer;
+      }
+      button.main {
+        background: var(--acc);
+        color: var(--bg);
+        border-color: var(--acc);
+        font-weight: 600;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .warn {
+        background: var(--warn);
+        border: 1px solid var(--warnl);
+        border-radius: 8px;
+        padding: 6px 10px;
+        margin: 6px 0;
+      }
+      .scroll {
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td,
+      th {
+        border-bottom: 1px solid var(--line);
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      table.doc td,
+      table.doc th {
+        font-size: 12px;
+        border: 1px solid var(--line);
+        padding: 4px 6px;
+      }
+      table.doc th {
+        background: var(--bg);
+      }
+      table.doc tr.spec td {
+        background: var(--bg);
+      }
+      .ctr {
+        text-align: center !important;
+      }
+      .tt {
+        font-size: 14px;
+      }
+      .li {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .li .nm {
+        flex: 1;
+        min-width: 180px;
+      }
+      .li.off .nm {
+        opacity: 0.55;
+      }
+      .big {
+        font-size: 17px;
+        font-weight: 600;
+      }
+      .ph {
+        color: var(--mut);
+        font-style: italic;
+      }
+      .up {
+        color: var(--acc);
+      }
+      .sig {
+        display: flex;
+        gap: 24px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+      .sig div {
+        flex: 1;
+        min-width: 200px;
+        border-top: 1px solid var(--fg);
+        padding-top: 4px;
+        font-size: 12px;
+      }
+      #modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      #modal .card {
+        max-width: 380px;
+        width: 100%;
+        margin: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm 10mm 14mm;
+        @bottom-center {
+          content: "Page " counter(page) " of " counter(pages);
+          font-size: 9pt;
+        }
+      }
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .noprint {
+          display: none !important;
+        }
+        .card {
+          border: 0;
+          padding: 0;
+        }
+        main {
+          max-width: none;
+          padding: 0;
+        }
+        thead {
+          display: table-header-group;
+        }
+        tr {
+          break-inside: avoid;
+        }
+        table.doc td,
+        table.doc th {
+          font-size: 8pt;
+        }
+        .sig {
+          break-inside: avoid;
+        }
+      }
+      .chip {
+        display: inline-block;
+        font-size: 12px;
+        padding: 2px 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--mut);
+      }
+      .chip.ok {
+        color: var(--acc);
+        border-color: var(--acc);
+      }
+      .chip.rv {
+        border-color: var(--warnl);
+      }
+      textarea {
+        font: inherit;
+        width: 100%;
+        min-height: 64px;
+        padding: 7px 9px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--fg);
+        box-sizing: border-box;
+      }
+      .tray {
+        border: 1px dashed var(--warnl);
+        border-radius: 8px;
+        padding: 8px;
+        margin: 6px 0;
+      }
+      .ed {
+        white-space: pre-wrap;
+      }
+      button.sm {
+        font-size: 11px;
+        padding: 2px 6px;
+      }
+      #modal .card.wide {
+        max-width: 560px;
+        max-height: 90vh;
+        overflow: auto;
+      }
+      details {
+        margin: 6px 0;
+      }
+      summary {
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--mut);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Scheme builder demo <span class="mut">v9</span></h1>
+      <p class="mut noprint">
+        Grade 6 English. Prices, wallet and the example payment are
+        placeholders. Four steps: set your term and timetable, choose what to
+        teach, choose your assessment methods and resources, then create your
+        scheme. Your draft saves itself: in this browser, or to your account
+        when you sign in.
+      </p>
+      <div id="bar" class="row noprint"></div>
+      <div id="cur" class="mut noprint"></div>
+      <section class="card noprint" id="edits" hidden></section>
+      <section class="card noprint" id="chooser">
+        <h2>Class and subject</h2>
+        <div class="row">
+          <label>Class<select id="selGrade"></select></label>
+          <label>Subject<select id="selSubject"></select></label>
+        </div>
+        <div class="mut" id="chmsg"></div>
+        <details id="mine">
+          <summary>My schemes</summary>
+          <div id="mylist" class="mut"></div>
+        </details>
+      </section>
+      <div id="adjust">
+        <section class="card">
+          <h2>1. Term and dates</h2>
+          <div class="row">
+            <label
+              >Academic year<select data-s="year">
+                <option>2026</option>
+                <option>2027</option>
+                <option>2028</option>
+              </select></label
+            >
+            <label
+              >Term<select data-s="term">
+                <option>Term 1</option>
+                <option>Term 2</option>
+                <option>Term 3</option>
+              </select></label
+            >
+            <label>Start date<input type="date" data-s="start" /></label
+            ><label>End date<input type="date" data-s="end" /></label>
+          </div>
+          <div id="csrc" class="mut"></div>
+          <div class="row">
+            <label
+              style="
+                flex-direction: row;
+                align-items: center;
+                gap: 6px;
+                color: var(--fg);
+              "
+              ><input type="checkbox" data-s="openWeek" /> Week 1 is
+              opening/preparation (no lessons)</label
+            >
+            <label
+              >End-term assessment/closing<select data-s="closeWeeks">
+                <option value="0">No closing weeks</option>
+                <option value="1">Last 1 week</option>
+                <option value="2">Last 2 weeks</option>
+              </select></label
+            >
+            <label
+              style="
+                flex-direction: row;
+                align-items: center;
+                gap: 6px;
+                color: var(--fg);
+              "
+              ><input type="checkbox" data-s="breakFirstDay" /> Lessons are held
+              on the first day of a half-term (untick if learners go home that
+              day)</label
+            >
+          </div>
+          <div class="row">
+            <button id="p1">Full term from the start of the book</button
+            ><button id="p2">
+              Last 4 weeks, from the last quarter of the book
+            </button>
+          </div>
+        </section>
+        <section class="card">
+          <h2>2. No-lesson days</h2>
+          <div class="row">
+            <label>From<input type="date" id="bf" /></label
+            ><label>To<input type="date" id="bt" /></label
+            ><label
+              >Reason<input
+                type="text"
+                id="br"
+                placeholder="Half-term, trip, exams" /></label
+            ><button id="badd">Add</button>
+          </div>
+          <div id="bmsg"></div>
+          <div id="blk"></div>
+          <div id="hol"></div>
+        </section>
+        <section class="card">
+          <h2>3. Weekly timetable</h2>
+          <div class="row" id="pat"></div>
+          <div class="mut">
+            Weekend lessons are supported: set Saturday or Sunday to the number
+            of lessons you teach.
+          </div>
+          <div class="mut" id="pt"></div>
+        </section>
+        <section class="card">
+          <h2>4. What to teach</h2>
+          <div class="row">
+            <label
+              >Plan type<select data-s="plan" id="plan">
+                <option value="continue">
+                  Continue through the book (a term or part of a term)
+                </option>
+                <option value="range">
+                  Cover a chosen range in these dates
+                </option>
+              </select></label
+            >
+          </div>
+          <div class="row">
+            <label
+              >Start at sub-strand<select data-s="from" id="from"></select
+            ></label>
+            <label
+              >Start at lesson<input
+                type="number"
+                min="1"
+                max="30"
+                data-s="fromLesson"
+                id="fromLesson"
+            /></label>
+            <label
+              >End at sub-strand<select data-s="to" id="to"></select
+            ></label>
+            <label
+              >If time is short<select data-s="mode">
+                <option value="squeeze">Shorten every sub-strand</option>
+                <option value="trim">
+                  Keep full lessons, drop the last ones
+                </option>
+              </select></label
+            >
+          </div>
+          <div class="mut" id="planhelp"></div>
+          <div class="row" id="prio"></div>
+        </section>
+        <section class="card">
+          <h2>5. Options</h2>
+          <div class="row">
+            <label
+              style="
+                flex-direction: row;
+                align-items: center;
+                gap: 6px;
+                color: var(--fg);
+              "
+              ><input type="checkbox" data-s="ai" /> AI-written lesson
+              content</label
+            >
+          </div>
+          <div class="mut">
+            Teaching style (choose up to 3; your profile sets the default)
+          </div>
+          <div class="row" id="styles"></div>
+        </section>
+        <section class="card">
+          <h2>6. Assessment methods and learning resources</h2>
+          <p class="mut">
+            The ticked choices are starting points that you can change. They
+            fill every lesson unless you set a sub-strand (the Methods button
+            below) or edit a single lesson. Textbook titles and page numbers are
+            always your own input.
+          </p>
+          <div class="mut">Assessment methods for all lessons</div>
+          <div class="row" id="asAll"></div>
+          <div class="row">
+            <label
+              >Textbook (shown with the page numbers)<input
+                type="text"
+                data-s="book"
+                maxlength="80"
+                placeholder="e.g. Oxford Learner’s Book 6"
+            /></label>
+          </div>
+          <div class="mut">
+            Enter the page numbers for each sub-strand in the list below.
+          </div>
+          <details>
+            <summary>Paste page numbers (one line per sub-strand)</summary>
+            <textarea
+              id="pgPaste"
+              placeholder="1.1.1: 12-15&#10;1.2.1: 16-19"
+            ></textarea>
+            <div class="row">
+              <button id="pgApply">Apply pasted pages</button>
+            </div>
+            <div class="mut" id="pgMsg"></div>
+          </details>
+          <div class="row">
+            <label
+              >Other learning resources for all lessons (type your own)<input
+                type="text"
+                data-s="resText"
+                maxlength="200"
+                placeholder="e.g. counters, number cards"
+            /></label>
+          </div>
+          <details id="kicdRes">
+            <summary>
+              Learning resources for all lessons (suggestions from the KICD
+              design)
+            </summary>
+            <div class="mut">Non-digital</div>
+            <div class="row" id="resN"></div>
+            <div class="mut">Digital</div>
+            <div class="row" id="resD"></div>
+          </details>
+        </section>
+        <section class="card" id="sum"></section>
+        <section class="card">
+          <h2>Sub-strands</h2>
+          <p class="mut">
+            Locking keeps your chosen lessons for a sub-strand when the scheme
+            is recalculated. Restore returns one sub-strand to the design’s
+            suggestion without touching your other choices. Entering 0 leaves a
+            sub-strand out, and it is labelled as such. The box marked pg. takes
+            the textbook pages for that sub-strand. Methods sets the assessment
+            methods for that sub-strand only.
+          </p>
+          <div id="list"></div>
+        </section>
+      </div>
+      <div id="scheme" hidden></div>
+      <div id="modal" hidden></div>
+    </main>
+    <script src="../js/scheme-edits.js"></script>
+    <script>
+      const D = [
+        [
+          "1.1.1",
+          1,
+          "Listening and Speaking",
+          "Pronunciation and Listening",
+          3,
+          5,
+          7,
+        ],
+        ["1.2.1", 1, "Reading", "Extensive Reading", 3, 4, 6],
+        ["1.3.1", 1, "Grammar in Use", "Word Classes", 3, 3, 6],
+        ["1.4.1", 1, "Writing", "Guided Writing", 3, 3, 5],
+        [
+          "2.1.1",
+          2,
+          "Listening and Speaking",
+          "Pronunciation and Listening Comprehension",
+          3,
+          4,
+          5,
+        ],
+        ["2.2.1", 2, "Reading", "Intensive Reading", 3, 5, 7],
+        ["2.3.1", 2, "Grammar in Use", "Word Classes", 3, 3, 6],
+        ["2.4.1", 2, "Writing", "Creative Writing", 3, 4, 9],
+        [
+          "3.1.1",
+          3,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
+        ["3.2.1", 3, "Reading", "Intensive Reading", 3, 4, 6],
+        ["3.3.1", 3, "Grammar in Use", "Correlative Conjunctions", 3, 4, 5],
+        ["3.4.1", 3, "Writing", "Mechanics of Writing", 3, 4, 5],
+        [
+          "4.1.1",
+          4,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          5,
+          10,
+        ],
+        ["4.2.1", 4, "Reading", "Intensive Reading", 3, 4, 6],
+        ["4.3.1", 4, "Grammar in Use", "Word Classes", 3, 3, 8],
+        ["4.4.1", 4, "Writing", "Functional Writing", 3, 3, 8],
+        [
+          "5.1.1",
+          5,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          5,
+        ],
+        ["5.2.1", 5, "Reading", "Extensive Reading", 2, 3, 5],
+        ["5.3.1", 5, "Grammar in Use", "Adjectives", 3, 3, 5],
+        ["5.4.1", 5, "Writing", "Creative Writing", 3, 4, 5],
+        [
+          "6.1.1",
+          6,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          5,
+        ],
+        ["6.2.1", 6, "Reading", "Intensive Reading", 3, 4, 9],
+        ["6.3.1", 6, "Grammar in Use", "Phrasal Quantifiers", 3, 3, 4],
+        ["6.4.1", 6, "Writing", "Creative Writing", 3, 4, 7],
+        [
+          "7.1.1",
+          7,
+          "Listening and Speaking",
+          "Pronunciation and Interactive Listening",
+          3,
+          5,
+          6,
+        ],
+        ["7.2.1", 7, "Reading", "Extensive Reading", 2, 3, 7],
+        ["7.3.1", 7, "Grammar in Use", "Tense", 3, 3, 5],
+        ["7.4.1", 7, "Writing", "Mechanics of writing", 3, 3, 7],
+        [
+          "8.1.1",
+          8,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
+        ["8.2.1", 8, "Reading", "Fluency", 3, 4, 6],
+        ["8.3.1", 8, "Grammar in Use", "Sentence Patterns", 3, 4, 6],
+        ["8.4.1", 8, "Writing", "Creative Writing", 3, 4, 5],
+        [
+          "9.1.1",
+          9,
+          "Listening and Speaking",
+          "Pronunciation and Speaking: Fluency",
+          3,
+          4,
+          8,
+        ],
+        [
+          "9.2.1",
+          9,
+          "Reading",
+          "Intensive Reading - Fictional and Non-fictional",
+          3,
+          4,
+          9,
+        ],
+        ["9.3.1", 9, "Grammar in Use", "Adverbs", 2, 3, 7],
+        ["9.4.1", 9, "Writing", "Mechanics of writing", 3, 3, 7],
+        [
+          "10.1.1",
+          10,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary: Interactive Listening",
+          3,
+          5,
+          6,
+        ],
+        ["10.2.1", 10, "Reading", "Intensive Reading", 3, 4, 6],
+        ["10.3.1", 10, "Grammar in Use", "Conjunctions", 3, 3, 5],
+        ["10.4.1", 10, "Writing", "Creative Writing", 2, 4, 6],
+        [
+          "11.1.1",
+          11,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
+        [
+          "11.2.1",
+          11,
+          "Reading",
+          "Intensive Reading: Digital Stories",
+          3,
+          4,
+          7,
+        ],
+        ["11.3.1", 11, "Grammar in Use", "Interrogatives", 3, 3, 5],
+        ["11.4.1", 11, "Writing", "Mechanics of writing", 2, 3, 4],
+        [
+          "12.1.1",
+          12,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
+        ["12.2.1", 12, "Reading", "Intensive Reading", 3, 4, 7],
+        ["12.3.1", 12, "Grammar in Use", "Question Tags", 3, 4, 6],
+        ["12.4.1", 12, "Writing", "Functional Writing", 3, 3, 6],
+        [
+          "13.1.1",
+          13,
+          "Listening and Speaking",
+          "Pronunciation and Intensive Listening",
+          3,
+          4,
+          6,
+        ],
+        ["13.2.1", 13, "Reading", "Extensive Reading", 2, 3, 7],
+        ["13.3.1", 13, "Grammar in Use", "Word Classes", 3, 3, 6],
+        ["13.4.1", 13, "Writing", "Mechanics of writing", 3, 4, 5],
+      ].map(([id, t, s, n, l, o, e]) => ({ id, t, s, n, l, o, e }));
+
+      const DAY = 86400000;
+      const toUTC = (s) => {
+        const [y, m, d] = s.split("-").map(Number);
+        return Date.UTC(y, m - 1, d);
+      };
+      const iso = (t) => new Date(t).toISOString().slice(0, 10);
+      function allocate(units, slots, mode) {
+        const out = {},
+          dropped = [],
+          warnings = [];
+        let pool = slots;
+        units
+          .filter((u) => u.lock != null)
+          .forEach((u) => {
+            out[u.id] = u.lock;
+            pool -= u.lock;
+          });
+        if (pool < 0) {
+          warnings.push(
+            "Your locked lessons add up to more than the lessons available.",
+          );
+          pool = 0;
+        }
+        const free = units
+          .filter((u) => u.lock == null)
+          .map((u) => ({ id: u.id, s: u.s, d: u.want * (u.w || 1) }));
+        const target = Math.min(
+          pool,
+          Math.round(free.reduce((a, u) => a + u.d, 0)),
+        );
+        if (mode === "trim") {
+          let left = target;
+          free.forEach((u) => {
+            const g = Math.min(Math.round(u.d), left);
+            out[u.id] = g;
+            left -= g;
+            if (!g) dropped.push(u.id);
+          });
+        } else {
+          while (free.length > target) dropped.push(free.pop().id);
+          const extra = target - free.length,
+            W = free.reduce((a, u) => a + Math.max(0, u.d - 1), 0),
+            E = 1e-9;
+          const xs = free.map(
+              (u) => 1 + (W ? (Math.max(0, u.d - 1) * extra) / W : 0),
+            ),
+            grp = {};
+          free.forEach((u, i) => {
+            (grp[u.s] = grp[u.s] || []).push(i);
+          });
+          const keys = Object.keys(grp),
+            gx = keys.map((k) => grp[k].reduce((a, i) => a + xs[i], 0));
+          const spread = (vals, total) => {
+            // largest-remainder rounding so the parts add up to total
+            const fl = vals.map((v) => Math.floor(v + E)),
+              order = vals
+                .map((v, i) => [v - fl[i], i])
+                .sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+            const need = total - fl.reduce((a, b) => a + b, 0);
+            for (let k = 0; k < need; k++) fl[order[k][1]]++;
+            return fl;
+          };
+          const gt = spread(gx, target); // round per strand first, then per sub-strand inside each strand
+          keys.forEach((k, gi) => {
+            const idx = grp[k],
+              parts = spread(
+                idx.map((i) => xs[i]),
+                gt[gi],
+              );
+            idx.forEach((i, j) => {
+              out[free[i].id] = parts[j];
+            });
+          });
+          dropped.forEach((id) => {
+            out[id] = 0;
+          });
+        }
+        const given = Object.values(out).reduce((a, b) => a + b, 0);
+        return {
+          alloc: out,
+          dropped,
+          spare: Math.max(0, slots - given),
+          warnings,
+        };
+      }
+      function buildCalendar(start, end, pattern, blocked) {
+        const weeks = [],
+          slots = [];
+        if (!start || !end || toUTC(end) < toUTC(start))
+          return { weeks, slots, bad: true };
+        const s = toUTC(start),
+          e = toUTC(end),
+          ws0 = s - ((new Date(s).getUTCDay() + 6) % 7) * DAY;
+        for (let ws = ws0; ws <= e; ws += 7 * DAY) {
+          const days = [];
+          for (let i = 0; i < 7; i++) {
+            const t = ws + i * DAY;
+            if (t < s || t > e || (i >= 5 && !(pattern[i] > 0))) continue;
+            const b = blocked.find(
+              (x) => x.from && x.to && t >= toUTC(x.from) && t <= toUTC(x.to),
+            );
+            const n = b ? 0 : pattern[i] || 0;
+            days.push({
+              date: iso(t),
+              n,
+              reason: b ? b.reason || "No lessons" : "",
+            });
+            for (let k = 0; k < n; k++) slots.push({ date: iso(t) });
+          }
+          if (days.length) weeks.push({ days });
+        }
+        return { weeks, slots, bad: false };
+      }
+      function assign(units, alloc, spare, slots) {
+        const stream = [];
+        units.forEach((u) => {
+          for (let i = 0; i < (alloc[u.id] || 0); i++)
+            stream.push({ u, k: i + 1, of: alloc[u.id] });
+        });
+        for (let i = 0; i < spare; i++) stream.push({ u: null });
+        const used = Math.min(stream.length, slots.length);
+        return { items: stream.slice(0, used), overflow: stream.length - used };
+      }
+
+      const SE = window.SchemeEdits;
+      const COUNTS = {};
+      D.forEach((u) => {
+        COUNTS[u.id] = { outcomes: u.o, experiences: u.e };
+      });
+
+      // ---- KICD Appendix 3 (Grade 6 English design, pages 126 to 128): suggested assessment methods per strand,
+      // and suggested learning resources (printed once for the whole table). Typed in from the PDF text, source wording kept
+      // (including "Portfolio dictation"). Until the importer stores each design's appendix, this list exists only for Grade 6 English.
+      const KICD_STRAND_ASSESS = {
+        listeningandspeaking: [
+          "oral reading or dictation recitations",
+          "role play",
+          "debates",
+          "oral interviews",
+          "dialogues",
+          "oral discussions",
+          "oral presentations",
+          "public speaking",
+          "teacher-made tests",
+          "peer assessment",
+          "self-assessment and standardised listening tests",
+        ],
+        reading: [
+          "Reading aloud",
+          "Dictation",
+          "Oral interviews",
+          "Question and answer",
+          "Teacher-made tests",
+          "Learner summaries of what they read",
+          "Learner journals",
+          "Learner portfolios",
+          "Peer assessment",
+          "Self-assessment and standardised reading tests",
+          "Keeping a record of books read",
+        ],
+        grammarinuse: [
+          "Tasks such as multiple choice",
+          "Discrimination",
+          "Gap-filling",
+          "Short-answer",
+          "Dialogue-completion, information gap",
+          "Role play",
+          "Simulation",
+          "Matching tasks",
+          "Substitution tables",
+          "Word games",
+          "Puzzles",
+          "Teacher made tests",
+        ],
+        writing: [
+          "Teacher-made tests",
+          "Learner journals",
+          "Peer assessment",
+          "Self-assessment",
+          "Portfolio dictation",
+          "Standardised writing tests",
+        ],
+      };
+      const KICD_RES_N = [
+        "course books",
+        "story books",
+        "poetry books",
+        "pictures and photographs",
+        "newspapers",
+        "magazines",
+        "junior encyclopedia",
+        "journals",
+        "dictionaries",
+        "diorama",
+        "flash cards",
+        "word wheels",
+        "word puzzles",
+        "code words",
+        "charts and realia",
+      ];
+      const KICD_RES_D = [
+        "digital story books",
+        "pictures and photographs",
+        "journals",
+        "electronic and digital devices",
+        "electronic or online dictionaries",
+        "flash cards",
+        "charts",
+        "video clips",
+        "audio-visual resources",
+        "other web resources",
+      ];
+      const COMMON_ASSESS = [
+        "Observation",
+        "Oral questions",
+        "Written exercise",
+        "Quiz",
+        "Checklist",
+        "Portfolio",
+      ];
+      const sk = (s) =>
+        String(s || "")
+          .toLowerCase()
+          .replace(/[^a-z]/g, "");
+      const resLabel = (k) => {
+        const g = k.slice(0, 1),
+          t = k.slice(2);
+        return g === "d" && KICD_RES_N.includes(t) ? t + " (digital)" : t;
+      };
+      const RES_ORDER = KICD_RES_N.map((x) => "n:" + x).concat(
+        KICD_RES_D.map((x) => "d:" + x),
+      );
+      const tog = (arr, v, on, order) => {
+        const i = arr.indexOf(v);
+        if (on && i < 0) arr.push(v);
+        if (!on && i >= 0) arr.splice(i, 1);
+        arr.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+      };
+
+      // ---- Curriculum text from the database (Firestore bundle). Empty until a signed-in user has loaded it. ----
+      const DEFAULT_BUNDLE = "ke-cbe_grade-6_english_v1",
+        CONTENT = {};
+      let CUR = { state: "none" },
+        CATALOG = [],
+        GROUPS = {},
+        BMETA = { grade: "Grade 6", subject: "English", reviewStatus: null };
+      const EMBED = D.map((x) => ({ ...x })); // the built-in Grade 6 English structure, used when signed out
+      const hasKicd = () => st.bundleId === DEFAULT_BUNDLE; // the typed-in Appendix 3 lists belong to Grade 6 English only
+      const srcNote = () =>
+        "Curriculum content: Kenya Institute of Curriculum Development (KICD), " +
+        BMETA.grade +
+        " " +
+        BMETA.subject +
+        " curriculum design. Not endorsed by KICD. The design gives a number of lessons per sub-strand but does not say which outcome or activity belongs to which lesson, so EduKitPrime divides them evenly across the lessons; adjust as needed.";
+      const appxNote = () =>
+        hasKicd()
+          ? "Assessment methods and learning resources are chosen by the teacher. The suggested lists come from Appendix 3 of the KICD Grade 6 English curriculum design (not endorsed by KICD)."
+          : "Assessment methods and learning resources are chosen by the teacher.";
+      const clean = (s) =>
+        String(s == null ? "" : s)
+          .replace(/\s+/g, " ")
+          .trim();
+      // The importer stores an outcome's letter in `letter` and a question's number in `number`, apart from `text`.
+      const withLabel = (x) => {
+        const o = x && typeof x === "object",
+          t = clean(o ? x.text : x);
+        const l = !o
+          ? ""
+          : x.letter
+            ? clean(x.letter) + ")"
+            : x.number != null && x.number !== ""
+              ? clean(x.number) + "."
+              : clean(x.label);
+        return l && !t.startsWith(l) ? l + " " + t : t;
+      };
+      async function loadBundle(db, fs, bundleId) {
+        const b = await fs.getDoc(fs.doc(db, "curriculumBundles", bundleId));
+        if (!b.exists()) throw new Error("curriculum bundle not found");
+        const bd = b.data(),
+          ids = bd.partIds || [];
+        if (!ids.length) throw new Error("curriculum bundle has no parts");
+        const snaps = await Promise.all(
+          ids.map((id) =>
+            fs.getDoc(fs.doc(db, "curriculumBundles", bundleId, "parts", id)),
+          ),
+        );
+        const rows = [],
+          content = {},
+          groups = {};
+        snaps.forEach((p, i) => {
+          if (!p.exists()) throw new Error("missing curriculum part " + ids[i]);
+          const pd = p.data(),
+            th = Math.floor(parseFloat(pd.theme && pd.theme.code)) || i + 1,
+            first = (pd.subStrands || [])[0];
+          groups[th] =
+            pd.theme && pd.theme.title
+              ? "Theme " + th + ": " + clean(pd.theme.title)
+              : /^strand-/.test(ids[i]) &&
+                  first &&
+                  first.strand &&
+                  first.strand.name
+                ? "Strand: " + clean(first.strand.name)
+                : "Theme " + th;
+          (pd.subStrands || []).forEach((x) => {
+            const outs = (x.outcomes && x.outcomes.items) || [],
+              exps = (x.experiences && x.experiences.bullets) || [],
+              qs = x.inquiryQuestions || [];
+            rows.push({
+              id: x.id,
+              t: th,
+              s: (x.strand && x.strand.name) || "",
+              n: x.name,
+              l: x.lessons || 0,
+              o: outs.length,
+              e: exps.length,
+            });
+            content[x.id] = {
+              stem: clean(x.outcomes && x.outcomes.stem),
+              outcomes: outs.map(withLabel),
+              exps: exps.map((e) => ({
+                t: clean(e.text),
+                sub: (e.subItems || []).map(withLabel),
+              })),
+              qs: qs.map(withLabel),
+            };
+          });
+        });
+        return { bundle: bd, rows, content, groups };
+      }
+      // The list of subjects a signed-in teacher can choose from (bundles marked active).
+      async function loadCatalogue(db, fs) {
+        const q = await fs.getDocs(
+          fs.query(
+            fs.collection(db, "curriculumBundles"),
+            fs.where("status", "==", "active"),
+          ),
+        );
+        const out = [];
+        q.forEach((d) => {
+          const b = d.data();
+          out.push({
+            id: d.id,
+            grade: b.grade,
+            subject: b.subject,
+            reviewStatus: b.reviewStatus || null,
+          });
+        });
+        return out;
+      }
+      function fillSelects() {
+        $("from").innerHTML = THEMES.map(
+          (t) =>
+            `<optgroup label="${esc(GROUPS[t] || "Theme " + t)}">` +
+            D.filter((u) => u.t === t)
+              .map(
+                (u) => `<option value="${u.id}">${u.id} ${esc(u.n)}</option>`,
+              )
+              .join("") +
+            "</optgroup>",
+        ).join("");
+        $("to").innerHTML = $("from").innerHTML;
+        $("prio").innerHTML = STRANDS.map(
+          (s) =>
+            `<label>${esc(s)}<select data-pr="${esc(s)}"><option value="">Normal time</option><option value="more">More time</option><option value="less">Less time</option></select></label>`,
+        ).join("");
+      }
+      function applyBundle(r, embedded) {
+        Object.keys(CONTENT).forEach((k) => delete CONTENT[k]);
+        Object.assign(CONTENT, r.content);
+        D.length = 0;
+        r.rows.forEach((x) => D.push(x));
+        Object.keys(COUNTS).forEach((k) => delete COUNTS[k]);
+        D.forEach((u) => {
+          COUNTS[u.id] = { outcomes: u.o, experiences: u.e };
+        });
+        STRANDS.splice(0, STRANDS.length, ...new Set(D.map((u) => u.s)));
+        THEMES.splice(0, THEMES.length, ...new Set(D.map((u) => u.t)));
+        GROUPS = r.groups || {};
+        BMETA = {
+          grade: r.bundle.grade || "Grade 6",
+          subject: r.bundle.subject || "English",
+          reviewStatus: r.bundle.reviewStatus || null,
+        };
+        fillSelects();
+        CUR = embedded
+          ? { state: "none" }
+          : {
+              state: "loaded",
+              status: r.bundle.reviewStatus || "unknown",
+              bundleId: r.bundle.bundleId,
+            };
+      }
+      const restoreEmbedded = () =>
+        applyBundle(
+          {
+            rows: EMBED.map((x) => ({ ...x })),
+            content: {},
+            groups: {},
+            bundle: { grade: "Grade 6", subject: "English" },
+          },
+          true,
+        );
+      function renderCur() {
+        const e = $("cur");
+        if (!e) return;
+        e.textContent =
+          CUR.state === "loaded"
+            ? "Curriculum: " +
+              BMETA.grade +
+              " " +
+              BMETA.subject +
+              " loaded from the database. Review status: " +
+              CUR.status +
+              (CUR.status === "auto-checked"
+                ? " (checked by script, not compared by hand)"
+                : "") +
+              "."
+            : CUR.state === "error"
+              ? "The curriculum text could not be loaded (" +
+                CUR.msg +
+                "). The scheme shows structure only."
+              : "Sign in to load the curriculum text. Until then the scheme shows structure only.";
+      }
+      let EDITS = {},
+        lastJson = "";
+      const SETTINGS = [
+        "year",
+        "term",
+        "start",
+        "end",
+        "src",
+        "loaded",
+        "blocked",
+        "pat",
+        "from",
+        "mode",
+        "prio",
+        "lock",
+        "skip",
+        "zero",
+        "ai",
+        "styles",
+        "school",
+        "teacher",
+        "cls",
+        "paid",
+        "paidAmount",
+        "plan",
+        "fromLesson",
+        "to",
+        "status",
+        "openWeek",
+        "closeWeeks",
+        "assessAll",
+        "assessSub",
+        "resAll",
+        "book",
+        "pages",
+        "breakFirstDay",
+        "holidayWork",
+        "bundleId",
+        "subject",
+        "resText",
+        "continuesFrom",
+      ];
+      // One storage layer. Today: this browser. Later: the same five calls against Firestore (users/{uid}/schemes/...).
+      const Store = {
+        ok: (() => {
+          try {
+            localStorage.setItem("ekp:t", "1");
+            localStorage.removeItem("ekp:t");
+            return true;
+          } catch (e) {
+            return false;
+          }
+        })(),
+        mem: {},
+        get(k) {
+          try {
+            return this.ok ? localStorage.getItem(k) : (this.mem[k] ?? null);
+          } catch (e) {
+            return this.mem[k] ?? null;
+          }
+        },
+        set(k, v) {
+          try {
+            if (this.ok) localStorage.setItem(k, v);
+            else this.mem[k] = v;
+          } catch (e) {
+            this.mem[k] = v;
+          }
+        },
+        del(k) {
+          try {
+            if (this.ok) localStorage.removeItem(k);
+          } catch (e) {}
+          delete this.mem[k];
+        },
+        keys(p) {
+          try {
+            return this.ok
+              ? Object.keys(localStorage).filter((k) => k.startsWith(p))
+              : Object.keys(this.mem).filter((k) => k.startsWith(p));
+          } catch (e) {
+            return [];
+          }
+        },
+        saveSettings(id, o) {
+          this.set("ekp:s:" + id, JSON.stringify(o));
+        },
+        loadSettings(id) {
+          const v = this.get("ekp:s:" + id);
+          return v ? JSON.parse(v) : null;
+        },
+        putEdit(id, docId, e) {
+          this.set("ekp:e:" + id + ":" + docId, JSON.stringify(e));
+        },
+        delEdit(id, docId) {
+          this.del("ekp:e:" + id + ":" + docId);
+        },
+        loadEdits(id) {
+          const o = {},
+            p = "ekp:e:" + id + ":";
+          this.keys(p).forEach((k) => {
+            try {
+              o[k.slice(p.length)] = JSON.parse(this.get(k));
+            } catch (e) {}
+          });
+          return o;
+        },
+        listSchemes() {
+          const out = [];
+          this.keys("ekp:s:").forEach((k) => {
+            try {
+              const o = JSON.parse(this.get(k));
+              out.push({
+                id: k.slice(6),
+                title: [o.cls, o.subject, o.term, o.year]
+                  .filter(Boolean)
+                  .join(" "),
+                bundleId: o.bundleId,
+                year: o.year,
+                term: o.term,
+                version: o.version || 0,
+                updatedAt: o.updatedAt || "",
+              });
+            } catch (e) {}
+          });
+          return out;
+        },
+        clear(id) {
+          this.keys("ekp:")
+            .filter(
+              (k) =>
+                k.startsWith("ekp:s:" + id) ||
+                k.startsWith("ekp:e:" + id + ":"),
+            )
+            .forEach((k) => this.del(k));
+        },
+      };
+      const LocalStore = {
+        kind: "local",
+        loadSettings: async (id) => Store.loadSettings(id),
+        saveSettings: async (id, o) => Store.saveSettings(id, o),
+        putEdit: async (id, d, e) => Store.putEdit(id, d, e),
+        delEdit: async (id, d) => Store.delEdit(id, d),
+        loadEdits: async (id) => Store.loadEdits(id),
+        listSchemes: async () => Store.listSchemes(),
+        clear: async (id) => Store.clear(id),
+      };
+      let store = LocalStore,
+        saveQ = Promise.resolve(),
+        problem = "",
+        user = null,
+        fb = null,
+        A = null,
+        FS = null,
+        SM = null,
+        FB = null;
+      // Adjust these if your folders differ (paths are relative to this page; open firebase-test.html to see yours).
+      const PATHS = {
+          firebase: "../js/firebase.js",
+          store: "../js/scheme-store.js",
+          profile: "../js/user-profile.js",
+        },
+        SDK = "https://www.gstatic.com/firebasejs/13.1.0/";
+      const keysFor = () =>
+        store.kind === "cloud"
+          ? SETTINGS.filter(
+              (k) => k !== "paid" && k !== "status" && k !== "paidAmount",
+            )
+          : SETTINGS; // payment state never goes to the account in this demo
+      const snap = () => JSON.stringify(keysFor().map((k) => st[k]));
+      function saveFailed(e) {
+        problem =
+          e && e.name === "ConflictError"
+            ? "This scheme was changed on another device. Reload the page to continue from the saved version."
+            : "Could not save: " +
+              ((e && (e.code || e.message)) || "unknown error") +
+              ". Your changes are still on this page.";
+        renderBar();
+      }
+      function save() {
+        if (!st.id) return;
+        const j = snap();
+        if (j === lastJson) return;
+        lastJson = j;
+        saveQ = saveQ
+          .then(async () => {
+            const v = st.version + 1,
+              o = {};
+            keysFor().forEach((k) => {
+              o[k] = st[k];
+            });
+            o.version = v;
+            o.updatedAt = new Date().toISOString();
+            await store.saveSettings(st.id, o, {
+              title: [st.cls, st.subject, st.term, st.year]
+                .join(" ")
+                .replace(/\s+/g, " "),
+              bundleId: st.bundleId,
+            });
+            st.version = v;
+            st.savedAt = o.updatedAt;
+            problem = "";
+            renderBar();
+            refreshMine();
+          })
+          .catch(saveFailed);
+      }
+      async function boot() {
+        if (!st.id) st.id = draftId();
+        let s = null;
+        try {
+          s = await store.loadSettings(st.id);
+        } catch (e) {
+          saveFailed(e);
+        }
+        if (s) {
+          keysFor().forEach((k) => {
+            if (k in s) st[k] = s[k];
+          });
+          st.version = s.version || 0;
+          st.savedAt =
+            s.updatedAt && s.updatedAt.toDate
+              ? s.updatedAt.toDate().toISOString()
+              : s.updatedAt || "";
+        } else {
+          loadCal();
+          st.version = 0;
+          st.savedAt = "";
+        }
+        try {
+          EDITS = await store.loadEdits(st.id);
+        } catch (e) {
+          EDITS = {};
+          saveFailed(e);
+        }
+        lastJson = snap();
+        return !!s;
+      }
+      // One saved scheme per class, subject, year and term: its id is built from those four.
+      const draftIdFor = (bundleId, year, term) =>
+        String(bundleId).replace(/^ke-cbe_/, "") +
+        "-" +
+        year +
+        "-t" +
+        String(term).slice(-1);
+      const draftId = () => draftIdFor(st.bundleId, st.year, st.term);
+      const byNewest = (a, b) =>
+        String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+      function resetPlan() {
+        Object.assign(st, {
+          plan: "continue",
+          mode: "squeeze",
+          fromLesson: 1,
+          prio: {},
+          lock: {},
+          skip: {},
+          zero: {},
+          assessSub: {},
+          from: D[0] ? D[0].id : "",
+          to: D.length ? D[D.length - 1].id : "",
+        });
+      }
+      async function ensureBundle(id) {
+        if (!user) {
+          if (id !== DEFAULT_BUNDLE)
+            throw new Error("sign in to open this subject");
+          restoreEmbedded();
+          return;
+        }
+        if (CUR.state === "loaded" && CUR.bundleId === id) return;
+        applyBundle(await loadBundle(FB.db, FS, id));
+      }
+      // Term 2 starts where Term 1 stopped (and keeps Term 1's priorities and locks so lesson numbers stay the same).
+      async function continueFromPrevious() {
+        const n = +String(st.term).slice(-1);
+        if (n < 2) return;
+        const prevId = draftIdFor(st.bundleId, st.year, "Term " + (n - 1));
+        let ps = null;
+        try {
+          ps = await store.loadSettings(prevId);
+        } catch (e) {}
+        if (!ps) return;
+        const snapshot = {};
+        SETTINGS.forEach((k) => (snapshot[k] = st[k]));
+        Object.keys(ps).forEach((k) => {
+          if (SETTINGS.includes(k)) st[k] = ps[k];
+        });
+        let np = null;
+        const carried = {};
+        try {
+          np = nextPoint(compute());
+          ["prio", "lock", "skip", "zero", "mode"].forEach(
+            (k) => (carried[k] = JSON.parse(JSON.stringify(st[k] || {}))),
+          );
+          carried.mode = st.mode;
+        } catch (e) {}
+        SETTINGS.forEach((k) => (st[k] = snapshot[k]));
+        if (np)
+          Object.assign(st, carried, {
+            plan: "continue",
+            from: np.id,
+            fromLesson: np.lesson,
+            continuesFrom: prevId,
+          });
+      }
+      const CARRY = [
+        "school",
+        "teacher",
+        "pat",
+        "styles",
+        "ai",
+        "assessAll",
+        "resAll",
+        "resText",
+        "openWeek",
+        "closeWeeks",
+        "breakFirstDay",
+      ];
+      async function startNew(prev, sameBundle) {
+        resetPlan();
+        st.cls = BMETA.grade;
+        st.subject = BMETA.subject;
+        if (prev) {
+          CARRY.forEach((k) => (st[k] = prev[k]));
+          if (sameBundle) {
+            st.pages = prev.pages || {};
+            st.book = prev.book || "";
+            st.assessSub = prev.assessSub || {};
+          }
+        }
+        await continueFromPrevious();
+        lastJson = snap(); // a new scheme is saved when something changes, not just by looking at it
+      }
+      async function settleBundle() {
+        try {
+          await ensureBundle(st.bundleId);
+          return true;
+        } catch (e) {
+          const msg = (e && (e.code || e.message)) || "unknown error";
+          if (st.bundleId === DEFAULT_BUNDLE) {
+            restoreEmbedded();
+            CUR = { state: "error", msg };
+          } else {
+            restoreEmbedded();
+            problem =
+              "That scheme needs a signed-in account (" +
+              msg +
+              "). Showing Grade 6 English instead.";
+            st.bundleId = DEFAULT_BUNDLE;
+            st.id = draftId();
+            await boot();
+            await startNew(null, false);
+          }
+          return false;
+        }
+      }
+      async function useStore(s) {
+        store = s;
+        problem = "";
+        resetState();
+        st.id = "";
+        try {
+          const list = await store.listSchemes();
+          list.sort(byNewest);
+          if (list.length) st.id = list[0].id;
+        } catch (e) {}
+        const had = await boot();
+        await settleBundle();
+        if (!had) await startNew(null, false);
+        else if (!D.some((u) => u.id === st.from)) resetPlan();
+        sync();
+        $("scheme").hidden = true;
+        $("adjust").hidden = false;
+        renderAdjust();
+        renderChooser();
+        refreshMine();
+      }
+      let switching = false;
+      async function switchTo(ch) {
+        if (switching) return;
+        switching = true;
+        const old = {
+          id: st.id,
+          bundleId: st.bundleId,
+          year: st.year,
+          term: st.term,
+        };
+        try {
+          await saveQ;
+          const prev = JSON.parse(JSON.stringify(st));
+          if (ch.id) {
+            const found = await store.loadSettings(ch.id);
+            if (!found) {
+              problem = "That scheme could not be found.";
+              return;
+            }
+            st.id = ch.id;
+            st.bundleId = found.bundleId || DEFAULT_BUNDLE;
+          } else {
+            if (ch.bundleId) st.bundleId = ch.bundleId;
+            if (ch.year) st.year = ch.year;
+            if (ch.term) st.term = ch.term;
+            st.id = draftId();
+          }
+          try {
+            await ensureBundle(st.bundleId);
+          } catch (e) {
+            Object.assign(st, old);
+            problem =
+              "Could not open that: " +
+              ((e && (e.code || e.message)) || "unknown error");
+            return;
+          }
+          const sameBundle = st.bundleId === old.bundleId;
+          const had = await boot();
+          if (!had) await startNew(prev, sameBundle);
+          else if (!D.some((u) => u.id === st.from)) resetPlan();
+          problem = "";
+          $("scheme").hidden = true;
+          $("adjust").hidden = false;
+          sync();
+          renderAdjust();
+          renderChooser();
+          refreshMine();
+        } finally {
+          switching = false;
+          renderBar();
+        }
+      }
+      const gradeNo = (g) => {
+        const m = String(g).match(/\d+/);
+        return /pre/i.test(g) ? (m ? +m[0] / 10 - 1 : -1) : m ? +m[0] : 99;
+      };
+      function renderChooser() {
+        const list = CATALOG.length
+          ? CATALOG
+          : [{ id: DEFAULT_BUNDLE, grade: "Grade 6", subject: "English" }];
+        const grades = [...new Set(list.map((b) => b.grade))].sort(
+          (a, b) => gradeNo(a) - gradeNo(b),
+        );
+        const cur = list.find((b) => b.id === st.bundleId) || list[0];
+        $("selGrade").innerHTML = grades
+          .map(
+            (g) =>
+              `<option ${g === cur.grade ? "selected" : ""}>${esc(g)}</option>`,
+          )
+          .join("");
+        $("selSubject").innerHTML = list
+          .filter((b) => b.grade === cur.grade)
+          .sort((a, b) => String(a.subject).localeCompare(b.subject))
+          .map(
+            (b) =>
+              `<option value="${esc(b.id)}" ${b.id === cur.id ? "selected" : ""}>${esc(b.subject)}${b.reviewStatus && b.reviewStatus !== "approved" ? " (" + esc(b.reviewStatus) + ")" : ""}</option>`,
+          )
+          .join("");
+        $("chmsg").textContent = user
+          ? CATALOG.length
+            ? ""
+            : "No subjects were found in the database."
+          : "Sign in to choose other classes and subjects.";
+      }
+      function chooserChanged(id) {
+        const list = CATALOG.length ? CATALOG : [];
+        if (id === "selSubject")
+          return switchTo({ bundleId: $("selSubject").value });
+        const first = list
+          .filter((b) => b.grade === $("selGrade").value)
+          .sort((a, b) => String(a.subject).localeCompare(b.subject))[0];
+        if (first) switchTo({ bundleId: first.id });
+      }
+      const bundleLabel = (id) => {
+        const b = CATALOG.find((x) => x.id === id);
+        return b
+          ? b.grade + " " + b.subject
+          : id === DEFAULT_BUNDLE || !id
+            ? "Grade 6 English"
+            : String(id);
+      };
+      async function refreshMine() {
+        let list = [];
+        try {
+          list = await store.listSchemes();
+        } catch (e) {}
+        list.sort(byNewest);
+        $("mylist").innerHTML = list.length
+          ? list
+              .map(
+                (x) =>
+                  `<div class="li"><span class="nm">${esc(x.title || x.id)}<br><span class="mut sm">${esc(bundleLabel(x.bundleId))} · v${x.version || 0}${x.updatedAt ? " · " + esc(new Date(x.updatedAt).toLocaleDateString("en-GB")) : ""}${x.id === st.id ? " · open now" : ""}</span></span>${x.id === st.id ? "" : `<button class="sm" data-open="${esc(x.id)}">Open</button>`}</div>`,
+              )
+              .join("")
+          : "No saved schemes yet. A scheme is saved as soon as you change something.";
+      }
+      function applyPaste() {
+        let ok = 0;
+        const bad = [];
+        $("pgPaste")
+          .value.split(/\r?\n/)
+          .forEach((line) => {
+            if (!line.trim()) return;
+            const m = line.match(
+              /^\s*(\d+(?:\.\d+)+(?:-[a-z])?)[\s:=]+(.+?)\s*$/,
+            );
+            if (m && /\d/.test(m[2]) && D.some((u) => u.id === m[1])) {
+              st.pages[m[1]] = clean(m[2]).slice(0, 40);
+              ok++;
+            } else bad.push(line.trim().slice(0, 30));
+          });
+        $("pgMsg").textContent =
+          ok +
+          " sub-strand(s) updated." +
+          (bad.length
+            ? " Not recognised: " +
+              bad.slice(0, 5).join(" | ") +
+              (bad.length > 5 ? " ..." : "")
+            : "");
+        renderAdjust();
+      }
+      async function initCloud() {
+        const M = window.__EKP_MOCK; // test hook: a fake Firebase, used only by the automated tests
+        try {
+          if (M) {
+            FB = M.FB;
+            A = M.A;
+            FS = M.FS;
+            SM = M.SM;
+          } else {
+            FB = await import(new URL(PATHS.firebase, location.href).href);
+            A = await import(SDK + "firebase-auth.js");
+            FS = await import(SDK + "firebase-firestore.js");
+            SM = await import(new URL(PATHS.store, location.href).href);
+          }
+        } catch (e) {
+          return;
+        } // opened as a plain file or offline: stay in this-browser mode
+        fb = FB;
+        renderBar();
+        A.onAuthStateChanged(FB.auth, async (u) => {
+          user = u;
+          if (u) {
+            try {
+              const up = M
+                ? { ensureUserProfile: async () => {} }
+                : await import(new URL(PATHS.profile, location.href).href);
+              await up.ensureUserProfile(u);
+            } catch (e) {}
+            try {
+              CATALOG = await loadCatalogue(FB.db, FS);
+            } catch (e) {
+              CATALOG = [];
+            }
+            await useStore(
+              SM.createCloudStore({ db: FB.db, uid: u.uid, fs: FS }),
+            );
+          } else {
+            CATALOG = [];
+            await useStore(LocalStore);
+          }
+        });
+      }
+      async function signIn() {
+        try {
+          await A.signInWithPopup(FB.auth, new A.GoogleAuthProvider());
+        } catch (e) {
+          saveFailed(e);
+        }
+      }
+      function dlWord() {
+        const t = document.querySelector("#scheme table.doc").cloneNode(true);
+        t.querySelectorAll("button, .noprint").forEach((b) => b.remove());
+        t.querySelectorAll("td.ed").forEach((td) => {
+          td.innerHTML = td.innerHTML.replace(/\n/g, "<br>");
+        });
+        const sig = document
+          .querySelector("#scheme .sig")
+          .outerHTML.replace(/<div>/g, "<p>")
+          .replace(/<\/div>/g, "</p>")
+          .replace('class="sig"', "");
+        const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Scheme of work</title><style>@page Section1{size:841.9pt 595.3pt;mso-page-orientation:landscape;margin:36pt}div.Section1{page:Section1}table{border-collapse:collapse;width:100%}td,th{border:1px solid #444;padding:3pt;font:8pt Arial;vertical-align:top}th{background:#eee}.mut,.sm{font-size:7pt;color:#555}.ctr{text-align:center}</style></head><body><div class="Section1">${t.outerHTML}<br>${sig}</div><\/body><\/html>`;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob(["\ufeff", doc], { type: "application/msword" }),
+        );
+        a.download =
+          "scheme-" + st.term.replace(/\s+/g, "") + "-" + st.year + ".doc";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      }
+      function statusLabel() {
+        const n = Object.keys(EDITS).length;
+        return st.status === "finalized"
+          ? "Finalized"
+          : (st.paid ? "Generated" : "Draft") +
+              (n ? " · teacher-edited (" + n + ")" : "");
+      }
+      function renderBar() {
+        renderCur();
+        $("bar").innerHTML =
+          `<span class="chip ok">${esc(statusLabel())}</span><span class="mut">${st.version ? "Saved v" + st.version + (st.savedAt ? " at " + new Date(st.savedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "") + " · " + (store.kind === "cloud" ? "your account" : "this browser") : "Not saved yet"}</span>${problem ? `<span class="warn">${esc(problem)}</span>` : ""}${fb ? (user ? `<span class="mut">${esc(user.email || user.displayName || "Signed in")}</span><button class="sm" id="signout">Sign out</button>` : `<button class="sm" id="signin">Sign in to save to your account</button>`) : ""}<button class="sm" id="newdraft">Reset this scheme</button>`;
+      }
+      const WT = { more: 1.3, less: 0.8 };
+      // PLACEHOLDER prices in KSh, not final. A scheme with BAND_MAX_WEEKS teaching weeks or fewer is priced as a mid-term scheme.
+      const PRICE = {
+          mid: { base: 30, ai: 20 },
+          term: { base: 50, ai: 40 },
+          year: 120,
+        },
+        BAND_MAX_WEEKS = 7,
+        BAND_LABEL = { mid: "Mid-term scheme", term: "Term scheme" };
+      const band = (tw) => (tw <= BAND_MAX_WEEKS ? "mid" : "term"),
+        priceOf = (tw, ai) =>
+          PRICE[band(tw)].base + (ai ? PRICE[band(tw)].ai : 0);
+      const teachingWeeks = (cal) =>
+        cal.weeks.filter((x) => x.days.some((d) => d.n)).length;
+      const nm = (id) => {
+        const u = D.find((x) => x.id === id);
+        return u ? id + " " + u.n : id;
+      };
+      // "Continue" plan: lay sub-strands out in book order at their planned size (suggested lessons x priority, or a lock) until the slots run out.
+      // k counts through the whole sub-strand, not through this scheme, so edit keys stay stable when a sub-strand spans two terms.
+      const sizeOf = (u) =>
+        u.lock != null ? u.lock : Math.max(1, Math.round(u.want * (u.w || 1)));
+      function continuePlan(units, slots, from, fromLesson) {
+        const size = {},
+          stream = [];
+        units.forEach((u) => {
+          const n = sizeOf(u);
+          size[u.id] = n;
+          for (let k = 1; k <= n; k++) stream.push({ u, k, of: n });
+        });
+        const first = units[0],
+          skipN =
+            first && first.id === from
+              ? Math.min(
+                  Math.max(1, parseInt(fromLesson) || 1) - 1,
+                  size[first.id] - 1,
+                )
+              : 0;
+        const pool = stream.slice(skipN),
+          items = pool.slice(0, slots.length),
+          cov = {};
+        items.forEach((it) => {
+          cov[it.u.id] = (cov[it.u.id] || 0) + 1;
+        });
+        const placed = items.length,
+          spare = slots.length - placed;
+        for (let i = 0; i < spare; i++) items.push({ u: null });
+        return { size, items, cov, spare, left: pool.length - placed, skipN };
+      }
+      function nextPoint(c) {
+        const real = c.a.items.filter((i) => i.u),
+          last = real[real.length - 1];
+        if (!last) return null;
+        if (last.k < last.of)
+          return { id: last.u.id, lesson: last.k + 1, of: last.of };
+        const nx = c.units[c.units.findIndex((u) => u.id === last.u.id) + 1];
+        return nx ? { id: nx.id, lesson: 1, of: sizeOf(nx) } : null;
+      }
+      const owedNow = () => {
+        const c = compute(),
+          price = priceOf(teachingWeeks(c.cal), st.ai);
+        return st.paid ? Math.max(0, price - (st.paidAmount || 0)) : price;
+      };
+      // Official calendar: Ministry of Education circular MOE.HQS/3/13/3 Vol III, 19 October 2026 (pre-primary, primary and junior schools).
+      // Half-term dates are copied as listed. Stopgap: this moves to Firestore (academicCalendars/{year}, admin-written) later.
+      const CIRC =
+        "Ministry of Education circular MOE.HQS/3/13/3 Vol III, 19 Oct 2026";
+      const CAL = {
+        "2027|Term 1": {
+          start: "2027-01-04",
+          end: "2027-04-09",
+          src: CIRC,
+          breaks: [
+            { from: "2027-02-19", to: "2027-02-28", reason: "Half term" },
+          ],
+          holidays: [
+            {
+              date: "2027-03-10",
+              name: "Idd-ul-Fitr",
+              note: "expected date: set by moon sighting, confirm when gazetted",
+            },
+            { date: "2027-03-26", name: "Good Friday", note: "" },
+            { date: "2027-03-29", name: "Easter Monday", note: "" },
+          ],
+        },
+        "2027|Term 2": {
+          start: "2027-05-03",
+          end: "2027-07-30",
+          src: CIRC,
+          breaks: [
+            { from: "2027-06-09", to: "2027-06-20", reason: "Half term" },
+          ],
+          holidays: [
+            {
+              date: "2027-05-17",
+              name: "Idd-ul-Azha",
+              note: "expected date: set by moon sighting, confirm when gazetted",
+            },
+            { date: "2027-06-01", name: "Madaraka Day", note: "" },
+          ],
+        },
+        "2027|Term 3": {
+          start: "2027-08-30",
+          end: "2027-11-05",
+          src: CIRC,
+          breaks: [],
+          holidays: [
+            {
+              date: "2027-10-11",
+              name: "Mazingira Day (observed)",
+              note: "10 October is a Sunday, so Monday is observed",
+            },
+            { date: "2027-10-20", name: "Mashujaa Day", note: "" },
+          ],
+        },
+      };
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+      const fmt = (d) =>
+        new Date(toUTC(d)).toLocaleDateString("en-GB", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          timeZone: "UTC",
+        });
+      const STRANDS = [...new Set(D.map((u) => u.s))],
+        THEMES = [...new Set(D.map((u) => u.t))],
+        DN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const STYLES = [
+        "Collaborative learning",
+        "Practical learning",
+        "Discussion-based",
+        "Project-based",
+      ];
+      const st = {
+        year: "2027",
+        term: "Term 1",
+        start: "",
+        end: "",
+        src: "Teacher-entered",
+        loaded: null,
+        blocked: [],
+        pat: [1, 1, 1, 1, 1, 0, 0],
+        from: "1.1.1",
+        fromLesson: 1,
+        to: "13.4.1",
+        plan: "continue",
+        mode: "squeeze",
+        prio: {},
+        lock: {},
+        skip: {},
+        zero: {},
+        ai: false,
+        styles: ["Collaborative learning"],
+        wallet: 200,
+        school: "",
+        teacher: "",
+        cls: "Grade 6",
+        bmsg: "",
+        paid: false,
+        paidAmount: 0,
+        status: "draft",
+        version: 0,
+        id: "",
+        savedAt: "",
+        bundleId: DEFAULT_BUNDLE,
+        subject: "English",
+        resText: "",
+        continuesFrom: "",
+        openWeek: true,
+        closeWeeks: 1,
+        assessAll: ["Observation", "Oral questions", "Written exercise"],
+        assessSub: {},
+        resAll: ["n:course books", "n:charts and realia"],
+        book: "",
+        pages: {},
+        breakFirstDay: true,
+        holidayWork: {},
+      };
+      const DEFAULTS = JSON.stringify(st);
+      const resetState = () =>
+        Object.assign(st, JSON.parse(DEFAULTS), { wallet: st.wallet });
+      function loadCal() {
+        const c = CAL[st.year + "|" + st.term];
+        st.blocked = st.blocked.filter((b) => !b.official);
+        if (c) {
+          st.start = c.start;
+          st.end = c.end;
+          st.src = c.src;
+          st.loaded = c;
+          c.breaks.forEach((b) =>
+            st.blocked.push({
+              from: b.from,
+              to: b.to,
+              reason: b.reason,
+              official: true,
+            }),
+          );
+        } else {
+          st.loaded = null;
+          st.src = "Teacher-entered";
+        }
+      }
+      // Opening and closing weeks are derived from the settings, not stored as no-lesson days.
+      // They apply only when the scheme runs from the term's opening day (and to its closing day).
+      function specialBlocks() {
+        const out = [];
+        if (!st.start || !st.end || toUTC(st.end) < toUTC(st.start)) return out;
+        const s = toUTC(st.start),
+          e = toUTC(st.end),
+          mon = (t) => t - ((new Date(t).getUTCDay() + 6) % 7) * DAY;
+        const atOpen = !st.loaded || st.start === st.loaded.start,
+          atClose = !st.loaded || st.end === st.loaded.end,
+          n = Math.max(0, Math.min(2, parseInt(st.closeWeeks) || 0));
+        if (st.openWeek && atOpen)
+          out.push({
+            from: st.start,
+            to: iso(Math.min(e, mon(s) + 6 * DAY)),
+            reason: "OPENING/PREPARATION",
+          });
+        if (n && atClose)
+          out.push({
+            from: iso(Math.max(s, mon(e) - (n - 1) * 7 * DAY)),
+            to: st.end,
+            reason: "END TERM ASSESSMENT/CLOSING",
+          });
+        return out;
+      }
+      // Official break dates are copied as the circular lists them. Many public day schools teach on the first listed day, so by default
+      // lessons run that day; boarding schools untick this. Public holidays default to no lessons; the teacher can hold lessons on any of them.
+      const holidaysNow = () => {
+        const c = st.loaded && CAL[st.year + "|" + st.term];
+        return c && c.holidays ? c.holidays : [];
+      };
+      function effBlocks() {
+        return st.blocked
+          .map((b) =>
+            b.official && st.breakFirstDay && b.from
+              ? { ...b, from: iso(toUTC(b.from) + DAY) }
+              : b,
+          )
+          .filter((b) => !(b.official && b.from > b.to));
+      }
+      const holidayBlocks = () =>
+        holidaysNow()
+          .filter((h) => !st.holidayWork[h.date])
+          .map((h) => ({ from: h.date, to: h.date, reason: h.name }));
+      const SPECIAL = [
+        [/opening|preparation/i, "open"],
+        [/half[\s-]?term/i, "half"],
+        [/end[\s-]?term|closing/i, "close"],
+      ];
+      const LBL_EN = {
+        title: "SCHEME OF WORK",
+        cols: [
+          "Wk",
+          "LSN",
+          "Strand",
+          "Sub-strand",
+          "Specific learning outcomes",
+          "Learning experiences",
+          "Key inquiry question(s)",
+          "Learning resources",
+          "Assessment methods",
+          "Reflection",
+        ],
+        sp: {
+          open: "OPENING/PREPARATION",
+          half: "HALF TERM",
+          close: "END TERM ASSESSMENT/CLOSING",
+        },
+      };
+      // Kiswahili column headings follow the Kiswahili curriculum design and the sample Kiswahili scheme; the three banner rows are
+      // my wording and should be checked by a Kiswahili teacher.
+      const LBL_SW = {
+        title: "AZIMIO LA KAZI",
+        cols: [
+          "Wiki",
+          "Kipindi",
+          "Mada",
+          "Mada ndogo",
+          "Matokeo maalum yanayotarajiwa",
+          "Shughuli za ujifunzaji zilizopendekezwa",
+          "Swali dadisi lililopendekezwa",
+          "Nyenzo",
+          "Mapendekezo ya tathmini",
+          "Maoni",
+        ],
+        sp: {
+          open: "KUFUNGUA SHULE / MAANDALIZI",
+          half: "LIKIZO FUPI YA MUHULA",
+          close: "TATHMINI YA MWISHO WA MUHULA / KUFUNGA SHULE",
+        },
+      };
+      const LBL = () => (BMETA.subject === "Kiswahili" ? LBL_SW : LBL_EN);
+      function specialLabel(ds) {
+        const rs = [
+          ...new Set(ds.filter((d) => d.reason).map((d) => d.reason)),
+        ];
+        if (rs.length !== 1) return "";
+        const m = SPECIAL.find((x) => x[0].test(rs[0]));
+        return m ? m[1] : "";
+      }
+      // Text for the two columns that used to be placeholders. A lesson edit beats these; a sub-strand setting beats the scheme-wide choice.
+      const asText = (id) =>
+        (
+          (Array.isArray(st.assessSub[id]) ? st.assessSub[id] : st.assessAll) ||
+          []
+        ).join("; ");
+      function resText(id) {
+        const parts = [],
+          book = clean(st.book),
+          pg = clean(id && st.pages[id]).replace(/^pgs?\.?\s*/i, "");
+        if (pg) parts.push((book ? book + ", " : "") + "pg. " + pg);
+        else if (book) parts.push(book);
+        if (hasKicd())
+          (st.resAll || []).forEach((k) => parts.push(resLabel(k)));
+        if (clean(st.resText)) parts.push(clean(st.resText));
+        return parts.join("; ");
+      }
+      $("from").innerHTML = THEMES.map(
+        (t) =>
+          `<optgroup label="${esc(GROUPS[t] || "Theme " + t)}">` +
+          D.filter((u) => u.t === t)
+            .map((u) => `<option value="${u.id}">${u.id} ${esc(u.n)}</option>`)
+            .join("") +
+          "</optgroup>",
+      ).join("");
+      $("to").innerHTML = $("from").innerHTML;
+      $("pat").innerHTML = DN.map(
+        (d, i) =>
+          `<label>${d}<input type="number" min="0" max="8" data-p="${i}"></label>`,
+      ).join("");
+      $("prio").innerHTML = STRANDS.map(
+        (s) =>
+          `<label>${esc(s)}<select data-pr="${esc(s)}"><option value="">Normal time</option><option value="more">More time</option><option value="less">Less time</option></select></label>`,
+      ).join("");
+      $("styles").innerHTML = STYLES.map(
+        (s) =>
+          `<label style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" data-st="${s}"> ${s}</label>`,
+      ).join("");
+      function sync() {
+        document.querySelectorAll("[data-s]").forEach((e) => {
+          const v = st[e.dataset.s];
+          if (e.type === "checkbox") e.checked = v;
+          else e.value = v;
+        });
+        document.querySelectorAll("[data-p]").forEach((e) => {
+          e.value = st.pat[e.dataset.p];
+        });
+        document.querySelectorAll("[data-st]").forEach((e) => {
+          e.checked = st.styles.includes(e.dataset.st);
+        });
+        document.querySelectorAll("[data-pr]").forEach((e) => {
+          e.value = st.prio[e.dataset.pr] || "";
+        });
+      }
+      function renderOpts() {
+        $("kicdRes").hidden = !hasKicd();
+        const chip = (attr, val, label, on) =>
+          `<label style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" ${attr}="${esc(val)}" ${on ? "checked" : ""}> ${esc(label)}</label>`;
+        $("asAll").innerHTML = COMMON_ASSESS.map((m) =>
+          chip("data-aa", m, m, st.assessAll.includes(m)),
+        ).join("");
+        $("resN").innerHTML = KICD_RES_N.map((x) =>
+          chip("data-ra", "n:" + x, x, st.resAll.includes("n:" + x)),
+        ).join("");
+        $("resD").innerHTML = KICD_RES_D.map((x) =>
+          chip(
+            "data-ra",
+            "d:" + x,
+            resLabel("d:" + x),
+            st.resAll.includes("d:" + x),
+          ),
+        ).join("");
+      }
+      function compute() {
+        const range = st.plan === "range",
+          i0 = Math.max(
+            0,
+            D.findIndex((u) => u.id === st.from),
+          );
+        let iE = D.length - 1,
+          badEnd = false;
+        if (range) {
+          const e = D.findIndex((u) => u.id === st.to);
+          if (e >= i0) iE = e;
+          else badEnd = true;
+        }
+        const inR = D.slice(i0, iE + 1);
+        const units = inR
+          .filter((u) => !st.skip[u.id])
+          .map((u) => ({
+            ...u,
+            want: u.l,
+            w: WT[st.prio[u.s]] || 1,
+            lock: st.lock[u.id] ?? null,
+          }));
+        const special = specialBlocks(),
+          cal = buildCalendar(st.start, st.end, st.pat, [
+            ...special,
+            ...effBlocks(),
+            ...holidayBlocks(),
+          ]);
+        if (range) {
+          const r = allocate(units, cal.slots.length, st.mode);
+          return {
+            inR,
+            units,
+            cal,
+            r,
+            a: assign(units, r.alloc, r.spare, cal.slots),
+            cov: r.alloc,
+            left: 0,
+            range,
+            badEnd,
+            special,
+          };
+        }
+        const k = continuePlan(units, cal.slots, st.from, st.fromLesson);
+        return {
+          inR,
+          units,
+          cal,
+          r: { alloc: k.size, dropped: [], spare: k.spare, warnings: [] },
+          a: { items: k.items, overflow: 0 },
+          cov: k.cov,
+          left: k.left,
+          range,
+          badEnd,
+          special,
+        };
+      }
+      function overlaps() {
+        const b = st.blocked.filter((x) => x.from && x.to),
+          m = [];
+        for (let i = 0; i < b.length; i++)
+          for (let j = i + 1; j < b.length; j++)
+            if (b[i].from <= b[j].to && b[j].from <= b[i].to)
+              m.push(
+                (b[i].reason || "No lessons") +
+                  " and " +
+                  (b[j].reason || "No lessons"),
+              );
+        return m;
+      }
+      function renderAdjust() {
+        renderOpts();
+        const c = compute(),
+          { units, cal, r, a, cov } = c,
+          slots = cal.slots.length,
+          tot = (x) => x.reduce((s, u) => s + u.l, 0);
+        const need = tot(units),
+          given = units.reduce((s, u) => s + (r.alloc[u.id] || 0), 0),
+          w = [...r.warnings];
+        const real = a.items.filter((i) => i.u),
+          placed = real.length;
+        if (!st.start || !st.end)
+          w.push("Enter both a start date and an end date.");
+        else if (cal.bad)
+          w.push(
+            "The end date is before the start date. Fix the dates to continue.",
+          );
+        if (
+          st.loaded &&
+          st.start &&
+          st.end &&
+          (st.start !== st.loaded.start || st.end !== st.loaded.end)
+        )
+          w.push(
+            "Your dates differ from the loaded calendar (" +
+              fmt(st.loaded.start) +
+              " to " +
+              fmt(st.loaded.end) +
+              ").",
+          );
+        overlaps().forEach((x) =>
+          w.push(
+            "Overlapping no-lesson periods: " +
+              x +
+              ". Overlapping days are only counted once; check this is what you meant.",
+          ),
+        );
+        if (c.badEnd)
+          w.push(
+            "The end sub-strand comes before the start sub-strand, so the plan runs to the end of the book.",
+          );
+        if (c.range) {
+          if (r.dropped.length)
+            w.push(
+              "Not enough lessons for everything. " +
+                r.dropped.length +
+                " sub-strand(s) at the end are left out: " +
+                r.dropped.join(", ") +
+                ".",
+            );
+          else if (need > slots)
+            w.push(
+              "The design suggests " +
+                need +
+                " lessons but you have " +
+                slots +
+                ". Sub-strands were shortened.",
+            );
+          if (a.overflow)
+            w.push(
+              "Your locked lessons run " +
+                a.overflow +
+                " lesson(s) past the end of the term.",
+            );
+        } else if (r.spare)
+          w.push(
+            "The book ends before your dates do: " +
+              r.spare +
+              " spare lesson(s) are marked revision.",
+          );
+        const tw = teachingWeeks(cal),
+          bd = cal.weeks.reduce(
+            (s, x) => s + x.days.filter((d) => d.reason).length,
+            0,
+          );
+        const base = c.range
+          ? allocate(
+              units.map((u) => ({ ...u, w: 1 })),
+              slots,
+              st.mode,
+            ).alloc
+          : continuePlan(
+              units.map((u) => ({ ...u, w: 1 })),
+              cal.slots,
+              st.from,
+              st.fromLesson,
+            ).cov;
+        const rows = STRANDS.map((s) => {
+          const us = units.filter((u) => u.s === s),
+            got = us.reduce((q, u) => q + (cov[u.id] || 0), 0),
+            bs = us.reduce((q, u) => q + (base[u.id] || 0), 0),
+            dl = got - bs;
+          const eff = `<td class="${dl > 0 ? "up" : ""}">${dl === 0 ? "-" : (dl > 0 ? "+" : "") + dl}</td>`;
+          return c.range
+            ? `<tr><td>${esc(s)}</td><td>${tot(us)}</td><td>${got}</td>${eff}</tr>`
+            : `<tr><td>${esc(s)}</td><td>${got}</td>${eff}</tr>`;
+        }).join("");
+        const head = c.range
+          ? "<tr><th>Strand</th><th>Suggested</th><th>Scheduled</th><th>Effect of your priorities</th></tr>"
+          : "<tr><th>Strand</th><th>Lessons in this scheme</th><th>Effect of your priorities</th></tr>";
+        const price = priceOf(tw, st.ai),
+          owed = st.paid ? Math.max(0, price - (st.paidAmount || 0)) : price;
+        const label = st.paid
+          ? owed > 0
+            ? "Update scheme · pay KSh " + owed + " more"
+            : "Update scheme (already paid)"
+          : "Create scheme · KSh " + price;
+        const tile = (t, v) =>
+          `<div><div class="mut">${t}</div><div class="big">${v}</div></div>`;
+        const tiles = c.range
+          ? tile("Teaching weeks", tw) +
+            tile("Lessons available", slots) +
+            tile("Suggested by the design", need) +
+            tile(
+              "Scheduled",
+              given + (r.spare ? " + " + r.spare + " revision" : ""),
+            ) +
+            tile(
+              "Coverage",
+              (need ? Math.round((100 * Math.min(given, need)) / need) : 0) +
+                "%",
+            ) +
+            tile("No-lesson days", bd)
+          : tile("Teaching weeks", tw) +
+            tile("Lessons available", slots) +
+            tile("Lessons placed", placed) +
+            tile("Left for later terms", c.left) +
+            tile("No-lesson days", bd);
+        const f = real[0],
+          l = real[real.length - 1],
+          np = nextPoint(c);
+        const info =
+          !c.range && f
+            ? `<p class="mut">Starts at ${esc(nm(f.u.id))}, lesson ${f.k} of ${f.of}. Ends at ${esc(nm(l.u.id))}, lesson ${l.k} of ${l.of}. ${np ? "The next term continues at " + esc(nm(np.id)) + ", lesson " + np.lesson + " of " + np.of + "." : "That is the end of the book."}</p>`
+            : "";
+        const spNote = c.special.length
+          ? `<p class="mut">Kept free of lessons: ${c.special.map((x) => esc(x.reason.toLowerCase())).join(" and ")} (change under 1. Term and dates).</p>`
+          : "";
+        const cc = CAL[st.year + "|" + st.term];
+        $("csrc").innerHTML =
+          esc(
+            "Calendar source: " +
+              st.src +
+              (st.loaded
+                ? "."
+                : ". No calendar is loaded for this term, so enter the dates from the official calendar."),
+          ) +
+          (st.loaded
+            ? " " +
+              esc(
+                "Schools do not always follow these dates exactly, so change the dates, remove a break and add your own, or untick the options below to match your school.",
+              )
+            : "") +
+          (cc
+            ? ' <button class="sm" id="calreset">Use official dates</button>'
+            : "");
+        $("sum").innerHTML =
+          `<h2>Your plan</h2><div class="row">${tiles}</div>${info}${spNote}` +
+          w.map((x) => `<div class="warn">${esc(x)}</div>`).join("") +
+          `<div class="scroll"><table>${head}${rows}</table></div><p class="mut">${BAND_LABEL[band(tw)]} (${tw} teaching weeks). Prices are placeholders. The scheme itself appears after payment. The price is shown now and changes as you add AI.</p><button class="main" id="create" ${cal.bad || !st.start || !st.end ? "disabled" : ""}>${label}</button>`;
+        const hols = holidaysNow();
+        $("hol").innerHTML = hols.length
+          ? `<h3>Public holidays in this term</h3><p class="mut">Observed by default (no lessons). Tick “Lessons held” on any day your school teaches.</p>` +
+            hols
+              .map(
+                (h) =>
+                  `<div class="li"><span class="nm">${esc(fmt(h.date))} · ${esc(h.name)}${h.note ? ` <span class="mut sm">(${esc(h.note)})</span>` : ""}</span><label style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" data-hw="${esc(h.date)}" ${st.holidayWork[h.date] ? "checked" : ""}> Lessons held</label></div>`,
+              )
+              .join("")
+          : "";
+        $("pt").textContent =
+          "Lessons per week: " + st.pat.reduce((s, n) => s + n, 0);
+        $("bmsg").innerHTML = st.bmsg
+          ? `<div class="warn">${esc(st.bmsg)}</div>`
+          : "";
+        $("blk").innerHTML = st.blocked
+          .map(
+            (b, i) =>
+              `<div class="li"><span class="nm">${esc(fmt(b.from))} to ${esc(fmt(b.to))} · ${esc(b.reason || "No lessons")}${b.official ? " (official calendar)" : ""}</span><button data-rm="${i}">Remove</button></div>`,
+          )
+          .join("");
+        $("list").innerHTML = c.inR
+          .map((u) => {
+            const off = !!st.skip[u.id],
+              lk = st.lock[u.id] != null,
+              al = r.alloc[u.id] ?? 0,
+              cv = cov[u.id] || 0;
+            const sized =
+              al < u.l ? "Shortened" : al > u.l ? "Extended" : "As suggested";
+            const status = off
+              ? st.zero[u.id]
+                ? "Left out (you entered 0)"
+                : "Skipped"
+              : c.range
+                ? r.dropped.includes(u.id)
+                  ? "Dropped: not enough time"
+                  : sized
+                : cv === 0
+                  ? "After this scheme"
+                  : cv < al
+                    ? "Partly in this scheme (" + cv + " of " + al + ")"
+                    : sized;
+            return `<div class="li${off ? " off" : ""}"><input type="checkbox" data-k="${u.id}" ${off ? "" : "checked"}><span class="nm">${esc(u.id + " " + u.n)}<br><span class="mut">${esc(u.s)} · Suggested ${u.l} · Allocated ${off ? 0 : al} · <b>${status}</b>${lk ? " · locked" : ""}</span></span>${off || lk ? `<button data-rs="${u.id}">Restore</button>` : ""}<button class="sm" data-am="${u.id}" ${off ? "disabled" : ""}>Methods${Array.isArray(st.assessSub[u.id]) ? " ✓" : ""}</button><input type="text" class="pg" maxlength="40" data-pg="${u.id}" placeholder="pg." title="Textbook pages for this sub-strand" value="${esc(st.pages[u.id] || "")}" ${off ? "disabled" : ""}><input type="number" min="0" max="30" data-n="${u.id}" ${off ? "disabled" : ""} value="${off ? "" : lk ? st.lock[u.id] : al}"></div>`;
+          })
+          .join("");
+        $("fromLesson").parentElement.hidden = c.range;
+        $("to").parentElement.hidden = !c.range;
+        document.querySelector('[data-s="mode"]').parentElement.hidden =
+          !c.range;
+        $("fromLesson").max = units[0] ? sizeOf(units[0]) : 1;
+        $("planhelp").textContent = c.range
+          ? "Everything from the start to the end sub-strand is fitted into your dates. If time is short it is shortened or trimmed, and spare lessons become revision."
+          : "Lessons follow the book in order at the suggested length (changed by your priorities and locks). When your dates run out the scheme stops, and the next term carries on from that point.";
+        renderEdits(c);
+        renderBar();
+        save();
+      }
+      const PH = {
+        slo: "from the curriculum",
+        le: "from the curriculum",
+        kiq: "from the curriculum",
+        res: "choose in step 6, or edit the lesson",
+        as: "choose in step 6, or edit the lesson",
+      };
+      const LT = (i) => String.fromCharCode(97 + i);
+      const lessonList = (c) => SE.lessonsFromItems(c.a.items, COUNTS);
+      function covers(l) {
+        if (!l.of) return { o: "", e: "" };
+        const c = COUNTS[l.subStrandId] || {},
+          o = c.outcomes ? SE.splitRange(c.outcomes, l.of, l.k) : null,
+          e = c.experiences ? SE.splitRange(c.experiences, l.of, l.k) : null;
+        return {
+          o: o
+            ? "Outcomes " +
+              (o[1] - o[0] > 1 ? LT(o[0]) + "-" + LT(o[1] - 1) : LT(o[0]))
+            : "",
+          e: e
+            ? "Activities " +
+              (e[1] - e[0] > 1 ? e[0] + 1 + "-" + e[1] : e[0] + 1)
+            : "",
+        };
+      }
+      const rerender = () => {
+        if ($("scheme").hidden) renderAdjust();
+        else renderScheme();
+      };
+      function renderEdits(c) {
+        const all = Object.values(EDITS),
+          el = $("edits");
+        if (!all.length || st.status === "finalized") {
+          el.hidden = true;
+          el.innerHTML = "";
+          return;
+        }
+        const ls = lessonList(c),
+          rec = SE.reconcile(ls, all),
+          lab = (e) => esc(e.subStrandId + " lesson " + e.k);
+        el.hidden = false;
+        el.innerHTML =
+          `<h2>Your saved lesson edits</h2><div class="row"><span class="chip ok">${rec.placed.length} in place</span><span class="chip rv">${rec.stale.length} to review</span><span class="chip rv">${rec.unplaced.length} unplaced</span><span class="chip">${rec.dormant.length} dormant</span></div>` +
+          rec.stale
+            .map(
+              (x) =>
+                `<div class="tray">${lab(x.edit)}: the lesson content changed since you edited it. <button class="sm" data-ed="${esc(x.edit.lessonKey)}">Review</button></div>`,
+            )
+            .join("") +
+          rec.unplaced
+            .map(
+              (x) =>
+                `<div class="tray">${lab(x.edit)} no longer exists in this scheme. Your text is kept: <i>${esc(
+                  Object.values(x.edit.fields || {})
+                    .join(" / ")
+                    .slice(0, 80),
+                )}</i><div class="row">${SE.suggestTargets(x.edit, ls)
+                  .map(
+                    (t) =>
+                      `<button class="sm" data-mv="${esc(x.edit.lessonKey)}|${esc(t)}">Move to lesson ${esc(t.split("#")[1])}</button>`,
+                  )
+                  .join(
+                    "",
+                  )}<button class="sm" data-dc="${esc(x.edit.lessonKey)}">Discard</button></div></div>`,
+            )
+            .join("") +
+          (rec.dormant.length
+            ? `<p class="mut">${rec.dormant.length} saved edit(s) belong to sub-strands that are not in this scheme (skipped, before your start point or dropped). They return if you add those sub-strands back.</p>`
+            : "");
+      }
+      const FIELDS = [
+        ["learningExperiences", "Learning experiences"],
+        ["activities", "Teaching activities"],
+        ["resources", "Learning resources (for example book and page numbers)"],
+        ["assessment", "Assessment methods"],
+        ["reflection", "Reflection (after the lesson)"],
+      ];
+      const genRes = (l) => resText(l && l.of ? l.subStrandId : null),
+        genAs = (l) => asText(l && l.of ? l.subStrandId : null);
+      function openEdit(key) {
+        const l = lessonList(compute()).find((x) => x.lessonKey === key);
+        if (!l) return;
+        const ed = EDITS[SE.editDocId(key)],
+          f = (ed && ed.fields) || {},
+          stale = ed && ed.basis !== l.basis,
+          g = covers(l);
+        $("modal").hidden = false;
+        $("modal").innerHTML =
+          `<div class="card wide"><h2>Edit ${esc(l.subStrandId)} · lesson ${l.k}${l.of ? " of " + l.of : ""}</h2><p class="mut">This lesson covers: ${esc([g.o, g.e].filter(Boolean).join(" · ") || "revision and assessment")}</p>${stale ? '<div class="warn">The generated lesson changed since you last edited it. Your text is kept; check it still fits.</div>' : ""}` +
+          FIELDS.map(
+            ([k, t]) =>
+              `<label>${t}<textarea data-f="${k}" maxlength="4000" placeholder="${esc(k === "resources" ? genRes(l) : k === "assessment" ? genAs(l) : "")}">${esc(f[k] || "")}</textarea></label>`,
+          ).join("") +
+          `<div class="row"><button class="main" data-sv="${esc(key)}">Save</button><button data-rg="${esc(key)}">Reset to generated</button><button id="ecancel">Cancel</button></div><p class="mut">Leave resources or assessment empty to keep the scheme-wide choice (shown greyed). AI actions (improve, make easier, make harder, add a group activity, add differentiation) arrive with the AI backend.</p></div>`;
+      }
+      function openAssess(id) {
+        const u = D.find((x) => x.id === id);
+        if (!u) return;
+        const cur = Array.isArray(st.assessSub[id])
+            ? st.assessSub[id]
+            : st.assessAll,
+          kic = hasKicd() ? KICD_STRAND_ASSESS[sk(u.s)] || [] : [],
+          box = (m) =>
+            `<label style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" data-ac="${esc(m)}" ${cur.includes(m) ? "checked" : ""}> ${esc(m)}</label>`;
+        $("modal").hidden = false;
+        $("modal").innerHTML =
+          `<div class="card wide"><h2>Assessment methods for ${esc(id + " " + u.n)}</h2><p class="mut">Applies to every lesson of this sub-strand. A lesson edit still wins.</p><div class="mut">Common methods</div><div class="row">${COMMON_ASSESS.map(box).join("")}</div>${kic.length ? `<div class="mut">Suggested by KICD for ${esc(u.s)} (Appendix 3)</div><div class="row">${kic.map(box).join("")}</div>` : ""}<label style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" id="asStrand"> Apply to every sub-strand in ${esc(u.s)}</label><div class="row"><button class="main" data-asave="${esc(id)}">Apply</button><button data-areset="${esc(id)}">Use the scheme-wide choice</button><button id="ecancel">Cancel</button></div></div>`;
+      }
+      function lessonText(l) {
+        const c = l && l.of && CONTENT[l.subStrandId];
+        if (!c) return null;
+        const rg = (n) => (n ? SE.splitRange(n, l.of, l.k) : [0, 0]),
+          [oa, ob] = rg(c.outcomes.length),
+          [ea, eb] = rg(c.exps.length),
+          [qa, qb] = rg(c.qs.length);
+        return {
+          slo:
+            (l.k === 1 && c.stem && ob > oa ? c.stem + "\n" : "") +
+            c.outcomes.slice(oa, ob).join("\n"),
+          exp: c.exps
+            .slice(ea, eb)
+            .map(
+              (b) => "\u2022 " + b.t + b.sub.map((x) => "\n   - " + x).join(""),
+            )
+            .join("\n"),
+          kiq: c.qs.slice(qa, qb).join("\n"),
+        };
+      }
+      function renderScheme() {
+        const c = compute(),
+          ls = lessonList(c),
+          rec = SE.reconcile(ls, Object.values(EDITS)),
+          tag = {},
+          fin = st.status === "finalized";
+        rec.placed.forEach((x) => {
+          tag[x.lesson.lessonKey] = "edited";
+        });
+        rec.stale.forEach((x) => {
+          tag[x.lesson.lessonKey] = "review: content changed";
+        });
+        let p = 0,
+          body = "";
+        c.cal.weeks.forEach((wk, wi) => {
+          const ds = wk.days,
+            notes = ds
+              .filter((d) => d.reason)
+              .map((d) => fmt(d.date) + ": " + d.reason),
+            total = ds.reduce((s, d) => s + d.n, 0);
+          if (!total) {
+            const sl = specialLabel(ds),
+              span = `${fmt(ds[0].date)} to ${fmt(ds[ds.length - 1].date)}`;
+            body += sl
+              ? `<tr class="spec"><td><b>${wi + 1}</b></td><td colspan="9" class="ctr"><b>${LBL().sp[sl]}</b> <span class="mut sm">(${span})</span></td></tr>`
+              : `<tr><td><b>${wi + 1}</b></td><td colspan="9" class="ph">No lessons (${span})${notes.length ? ": " + esc(notes.join("; ")) : ""}</td></tr>`;
+            return;
+          }
+          let lsn = 0;
+          ds.forEach((d) => {
+            for (let k = 0; k < d.n; k++) {
+              const it = c.a.items[p],
+                l = ls[p];
+              p++;
+              lsn++;
+              const f =
+                  ((l && EDITS[SE.editDocId(l.lessonKey)]) || {}).fields || {},
+                g = l ? covers(l) : { o: "", e: "" },
+                lt = lessonText(l);
+              const T = (txt, ph) =>
+                txt
+                  ? `<td class="ed">${esc(txt)}</td>`
+                  : `<td class="ph">${esc(ph)}</td>`;
+              const le =
+                (f.learningExperiences
+                  ? esc(f.learningExperiences)
+                  : lt && lt.exp
+                    ? esc(lt.exp)
+                    : `<span class="ph">${st.ai ? "AI draft: " + esc(st.styles.join(" + ").toLowerCase()) + " · " : ""}${esc(g.e || PH.le)}</span>`) +
+                (f.activities
+                  ? `<div><b>Activities:</b> ${esc(f.activities)}</div>`
+                  : "");
+              const sloCell =
+                  lt && lt.slo
+                    ? `<td class="ed">${esc(lt.slo)}</td>`
+                    : T("", g.o || PH.slo),
+                kiqCell =
+                  lt && lt.kiq
+                    ? `<td class="ed">${esc(lt.kiq)}</td>`
+                    : T("", PH.kiq);
+              body += `<tr><td>${lsn === 1 ? "<b>" + (wi + 1) + "</b>" : ""}</td><td>${lsn}<div class="mut sm">${fmt(d.date)}</div>${l && !fin ? `<button class="sm noprint" data-ed="${esc(l.lessonKey)}">Edit</button>` : ""}${l && tag[l.lessonKey] ? `<div class="sm noprint">${tag[l.lessonKey]}</div>` : ""}</td><td>${it && it.u ? esc(it.u.s) : ""}</td><td>${it ? (it.u ? esc(it.u.id + " " + it.u.n) + `<div class="mut sm">lesson ${it.k} of ${it.of}</div>` : "Revision and assessment") : ""}</td>${sloCell}<td class="ed">${le}</td>${kiqCell}${T(f.resources || genRes(l), PH.res)}${T(f.assessment || genAs(l), PH.as)}<td class="ed">${esc(f.reflection || "")}</td></tr>`;
+            }
+          });
+          if (notes.length)
+            body += `<tr><td></td><td colspan="9" class="mut sm">Week ${wi + 1}, no lessons on: ${esc(notes.join("; "))}</td></tr>`;
+        });
+        if (Object.keys(CONTENT).length)
+          body += `<tr><td colspan="10" class="mut sm">${esc(srcNote())}</td></tr>`;
+        body += `<tr><td colspan="10" class="mut sm">${esc(appxNote())}</td></tr>`;
+        $("scheme").innerHTML =
+          `<section class="card"><div class="row noprint">${fin ? '<span class="chip ok">Finalized: read-only</span><button id="nv">Make a new version</button>' : '<button id="back">Adjust again</button>' + (store.kind === "cloud" ? '<button disabled title="Finalizing is a server step that arrives with payments">Finalize (coming)</button>' : '<button data-fin="1">Finalize this scheme</button>')}<button class="main" id="print">Print or save as PDF</button><button id="dlword" title="Demo download. The real Word file will be built on the server after payment.">Download Word (demo)</button></div>
+<div class="row noprint"><label>School<input type="text" data-h="school" value="${esc(st.school)}"></label><label>Teacher<input type="text" data-h="teacher" value="${esc(st.teacher)}"></label><label>Class<input type="text" data-h="cls" value="${esc(st.cls)}"></label></div>
+<p class="mut noprint">Demo: grey italic cells are placeholders. Use Edit on any lesson to add your own text. The Reflection column stays for you to fill.</p>
+<div class="scroll"><table class="doc"><thead><tr><td colspan="10" class="tt"><b id="hd"></b><div id="hi" class="mut"></div></td></tr>
+<tr>${LBL()
+            .cols.map((c) => "<th>" + esc(c) + "</th>")
+            .join("")}</tr></thead><tbody>${body}</tbody></table></div>
+<div class="sig"><div>Prepared by (teacher): signature and date</div><div>Checked by (HOD or deputy): signature and date</div><div>Approved by (head teacher): signature and date</div></div></section>`;
+        hd();
+        renderEdits(c);
+        renderBar();
+      }
+      function hd() {
+        const c = compute(),
+          real = c.a.items.filter((i) => i.u),
+          f = real[0],
+          l = real[real.length - 1];
+        $("hd").textContent =
+          `${LBL().title} · ${String(st.subject).toUpperCase()} · ${st.cls.toUpperCase()} · ${st.term.toUpperCase()} ${st.year}`;
+        $("hi").textContent =
+          `Teacher: ${st.teacher || "........................"}   School: ${st.school || "........................"}   Class: ${st.cls}` +
+          (f
+            ? `   Covers: ${f.u.id} (lesson ${f.k}) to ${l.u.id} (lesson ${l.k} of ${l.of})`
+            : "");
+      }
+      function pay() {
+        const c = compute(),
+          tw = teachingWeeks(c.cal),
+          b = band(tw),
+          p = PRICE[b],
+          price = priceOf(tw, st.ai),
+          due = st.paid ? Math.max(0, price - (st.paidAmount || 0)) : price,
+          enough = st.wallet >= due;
+        $("modal").hidden = false;
+        $("modal").innerHTML =
+          `<div class="card"><h2>Create your scheme</h2><table><tr><td>${BAND_LABEL[b]} (${tw} teaching weeks), Word and PDF</td><td>KSh ${p.base}</td></tr>${st.ai ? `<tr><td>AI-written lesson content</td><td>KSh ${p.ai}</td></tr>` : ""}${st.paid ? `<tr><td>Already paid</td><td>- KSh ${st.paidAmount || 0}</td></tr>` : ""}<tr><td><b>To pay now</b></td><td><b>KSh ${due}</b></td></tr></table>
+<p class="mut">Wallet balance: KSh ${st.wallet}. Demo only: no real payment happens, and these prices are placeholders. Planned: all three terms of the year together at about KSh ${PRICE.year} (not available yet).</p><div class="row">${enough ? `<button class="main" id="payw">Pay from wallet</button>` : `<button id="topup">Top up KSh 100</button>`}<button id="paym">Pay with M-Pesa</button><button id="payc">Cancel</button></div></div>`;
+      }
+      function unlock(fw, due) {
+        st.paid = true;
+        st.paidAmount = (st.paidAmount || 0) + (due || 0);
+        save();
+        if (fw) st.wallet -= due || 0;
+        $("modal").hidden = true;
+        $("adjust").hidden = true;
+        $("scheme").hidden = false;
+        renderScheme();
+        window.scrollTo(0, 0);
+      }
+      document.addEventListener("change", (e) => {
+        const t = e.target,
+          d = t.dataset;
+        if (t.id === "selGrade" || t.id === "selSubject") {
+          chooserChanged(t.id);
+          return;
+        }
+        if (d.s === "year" || d.s === "term") {
+          switchTo({ [d.s]: t.value });
+          return;
+        } else if (d.s === "start" || d.s === "end") {
+          st[d.s] = t.value;
+          st.src = st.loaded ? "Teacher-adjusted" : "Teacher-entered";
+        } else if (d.s === "from") {
+          st.from = t.value;
+          st.fromLesson = 1;
+          sync();
+        } else if (d.s) st[d.s] = t.type === "checkbox" ? t.checked : t.value;
+        else if (d.p) st.pat[d.p] = Math.max(0, parseInt(t.value) || 0);
+        else if (d.st) {
+          const i = st.styles.indexOf(d.st);
+          if (t.checked && i < 0) {
+            if (st.styles.length >= 3) t.checked = false;
+            else st.styles.push(d.st);
+          } else if (!t.checked && i >= 0) {
+            if (st.styles.length === 1) t.checked = true;
+            else st.styles.splice(i, 1);
+          }
+        } else if (d.pr) {
+          if (t.value) st.prio[d.pr] = t.value;
+          else delete st.prio[d.pr];
+        } else if (d.k) {
+          if (t.checked) {
+            delete st.skip[d.k];
+            delete st.zero[d.k];
+          } else st.skip[d.k] = true;
+        } else if (d.n) {
+          const v = parseInt(t.value);
+          if (isNaN(v)) delete st.lock[d.n];
+          else if (v === 0) {
+            st.skip[d.n] = true;
+            st.zero[d.n] = true;
+            delete st.lock[d.n];
+          } else st.lock[d.n] = v;
+        } else if (d.aa) tog(st.assessAll, d.aa, t.checked, COMMON_ASSESS);
+        else if (d.ra) tog(st.resAll, d.ra, t.checked, RES_ORDER);
+        else if (d.hw) {
+          if (t.checked) st.holidayWork[d.hw] = true;
+          else delete st.holidayWork[d.hw];
+        } else if (d.pg) {
+          const v = clean(t.value).slice(0, 40);
+          if (v) st.pages[d.pg] = v;
+          else delete st.pages[d.pg];
+        } else return;
+        renderAdjust();
+      });
+      document.addEventListener("input", (e) => {
+        const h = e.target.dataset.h;
+        if (h) {
+          st[h] = e.target.value;
+          hd();
+          save();
+        }
+      });
+      document.addEventListener("click", (e) => {
+        const t = e.target,
+          id = t.id;
+        if (t.dataset.rm) {
+          st.blocked.splice(+t.dataset.rm, 1);
+          renderAdjust();
+        } else if (t.dataset.rs) {
+          const k = t.dataset.rs;
+          delete st.skip[k];
+          delete st.lock[k];
+          delete st.zero[k];
+          renderAdjust();
+        } else if (id === "badd") {
+          const f = $("bf").value,
+            to = $("bt").value || f;
+          st.bmsg = "";
+          if (!f) st.bmsg = "Choose the first day of the no-lesson period.";
+          else if (to < f)
+            st.bmsg =
+              "The last day is before the first day. Please correct it.";
+          else {
+            st.blocked.push({ from: f, to, reason: $("br").value.trim() });
+            $("bf").value = $("bt").value = $("br").value = "";
+          }
+          renderAdjust();
+        } else if (id === "calreset") {
+          loadCal();
+          sync();
+          renderAdjust();
+        } else if (id === "p1") {
+          st.plan = "continue";
+          st.from = D[0] ? D[0].id : st.from;
+          st.fromLesson = 1;
+          sync();
+          renderAdjust();
+        } else if (id === "p2") {
+          st.plan = "range";
+          st.from = D[Math.min(D.length - 1, Math.floor(D.length * 0.75))].id;
+          st.to = D[D.length - 1].id;
+          if (st.start) {
+            st.end = iso(toUTC(st.start) + 3 * 7 * DAY + 4 * DAY);
+            st.src = st.loaded ? "Teacher-adjusted" : "Teacher-entered";
+          }
+          sync();
+          renderAdjust();
+        } else if (id === "create") {
+          if (st.paid && owedNow() <= 0) unlock(false, 0);
+          else pay();
+        } else if (id === "payc") $("modal").hidden = true;
+        else if (id === "payw") unlock(true, owedNow());
+        else if (id === "paym") unlock(false, owedNow());
+        else if (id === "topup") {
+          st.wallet += 100;
+          pay();
+        } else if (id === "back") {
+          $("scheme").hidden = true;
+          $("adjust").hidden = false;
+          renderAdjust();
+        } else if (t.dataset.am) openAssess(t.dataset.am);
+        else if (t.dataset.asave) {
+          const sid = t.dataset.asave,
+            u = D.find((x) => x.id === sid),
+            arr = [...document.querySelectorAll("#modal [data-ac]")]
+              .filter((a) => a.checked)
+              .map((a) => a.dataset.ac),
+            strand = $("asStrand") && $("asStrand").checked;
+          D.filter((x) => x.id === sid || (strand && u && x.s === u.s)).forEach(
+            (x) => {
+              st.assessSub[x.id] = arr.slice();
+            },
+          );
+          $("modal").hidden = true;
+          rerender();
+        } else if (t.dataset.areset) {
+          delete st.assessSub[t.dataset.areset];
+          $("modal").hidden = true;
+          rerender();
+        } else if (t.dataset.ed) openEdit(t.dataset.ed);
+        else if (t.dataset.sv) {
+          const key = t.dataset.sv,
+            l = lessonList(compute()).find((x) => x.lessonKey === key),
+            fields = {};
+          document.querySelectorAll("#modal [data-f]").forEach((a) => {
+            if (a.value.trim()) fields[a.dataset.f] = a.value.trim();
+          });
+          const chk = SE.validateEditFields(fields);
+          if (!chk.valid) {
+            let w = $("modal").querySelector(".warn.err");
+            if (!w) {
+              w = document.createElement("div");
+              w.className = "warn err";
+              $("modal").querySelector(".row").before(w);
+            }
+            w.textContent = chk.error;
+            return;
+          }
+          const did = SE.editDocId(key);
+          if (!Object.keys(fields).length) {
+            delete EDITS[did];
+            store.delEdit(st.id, did).catch(saveFailed);
+          } else {
+            EDITS[did] = {
+              lessonKey: key,
+              subStrandId: l.subStrandId,
+              k: l.k,
+              fields,
+              basis: l.basis,
+              source: "manual",
+              style: null,
+              editedAt: new Date().toISOString(),
+            };
+            store.putEdit(st.id, did, EDITS[did]).catch(saveFailed);
+          }
+          $("modal").hidden = true;
+          rerender();
+        } else if (t.dataset.rg) {
+          const did = SE.editDocId(t.dataset.rg);
+          delete EDITS[did];
+          store.delEdit(st.id, did).catch(saveFailed);
+          $("modal").hidden = true;
+          rerender();
+        } else if (id === "ecancel") $("modal").hidden = true;
+        else if (t.dataset.mv) {
+          const [ek, tk] = t.dataset.mv.split("|"),
+            ls = lessonList(compute()),
+            tl = ls.find((x) => x.lessonKey === tk),
+            od = SE.editDocId(ek),
+            nd = SE.editDocId(tk);
+          const mv = SE.moveEdit(EDITS[od], tl, EDITS[nd]);
+          delete EDITS[od];
+          store.delEdit(st.id, od).catch(saveFailed);
+          EDITS[nd] = mv;
+          store.putEdit(st.id, nd, mv).catch(saveFailed);
+          rerender();
+        } else if (t.dataset.dc) {
+          const od = SE.editDocId(t.dataset.dc);
+          delete EDITS[od];
+          store.delEdit(st.id, od).catch(saveFailed);
+          rerender();
+        } else if (t.dataset.fin) {
+          st.status = "finalized";
+          save();
+          renderScheme();
+        } else if (id === "nv") {
+          st.status = "draft";
+          st.paid = false;
+          st.paidAmount = 0;
+          save();
+          $("scheme").hidden = true;
+          $("adjust").hidden = false;
+          renderAdjust();
+        } else if (id === "pgApply") applyPaste();
+        else if (t.dataset.open) switchTo({ id: t.dataset.open });
+        else if (id === "newdraft") {
+          store
+            .clear(st.id)
+            .catch(() => {})
+            .finally(() => location.reload());
+        } else if (id === "dlword") dlWord();
+        else if (id === "signin") signIn();
+        else if (id === "signout") A.signOut(FB.auth);
+        else if (id === "print") window.print();
+      });
+      (async () => {
+        await useStore(LocalStore);
+        initCloud();
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function okSettings(d) {
+      return d.ownerId == request.auth.uid && d.status in ['draft', 'archived']
+        && d.title is string && d.title.size() <= 120 && d.version is int;
+    }
+
+    // USER ACCOUNTS (unchanged)
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.role == 'teacher'
+        && request.resource.data.accountStatus == 'active';
+      allow update: if isOwner(userId)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.accountStatus == resource.data.accountStatus;
+      allow delete: if false;
+    }
+
+    // TEACHER PROFILES (unchanged)
+    match /teacherProfiles/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // CURRICULUM: written only by import_firestore.py (the Admin SDK bypasses rules)
+    match /curriculumBundles/{bundleId} {
+      allow get, list: if isSignedIn() && resource.data.status == 'active';
+      allow write: if false;
+      match /parts/{partId} {
+        allow get: if isSignedIn() && resource.data.status == 'active';   // no list: parts are fetched by id from bundle.partIds
+        allow write: if false;
+      }
+    }
+
+    // SAVED SCHEMES (from docs/scheme-data-model.md)
+    match /users/{userId}/schemes/{schemeId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && okSettings(request.resource.data)
+                    && request.resource.data.status == 'draft' && request.resource.data.version == 1;
+      allow update: if isOwner(userId)
+                    && request.resource.data.ownerId == resource.data.ownerId
+                    && request.resource.data.version == resource.data.version + 1
+                    && ((resource.data.status != 'finalized' && okSettings(request.resource.data))
+                      || (resource.data.status == 'finalized' && request.resource.data.status == 'archived'
+                          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'version', 'updatedAt'])));
+      allow delete: if isOwner(userId) && resource.data.status == 'draft';
+      match /edits/{editId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['lessonKey', 'subStrandId', 'k', 'fields', 'basis', 'source', 'style', 'editedAt'])
+          && request.resource.data.lessonKey is string && request.resource.data.lessonKey.size() <= 40
+          && request.resource.data.fields is map && request.resource.data.fields.size() <= 8
+          && request.resource.data.source in ['manual', 'ai'];
+      }
+      match /exports/{exportId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+    }
+
+    // Everything else remains inaccessible from the client.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
