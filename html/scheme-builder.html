@@ -393,14 +393,14 @@
                 gap: 6px;
                 color: var(--fg);
               "
-              ><input type="checkbox" data-s="breakFirstDay" /> Lessons are
-              held on the first day of a half-term (untick if learners go
-              home that day)</label
+              ><input type="checkbox" data-s="breakFirstDay" /> Lessons are held
+              on the first day of a half-term (untick if learners go home that
+              day)</label
             >
           </div>
           <div class="row">
             <button id="p1">Full term from the start of the book</button
-            ><button id="p2">Last 4 weeks, from the last quarter of the book</button>
+           <button id="p2">Short scheme: last 4 weeks of the book (changes the end date)</button>
           </div>
         </section>
         <section class="card">
@@ -493,8 +493,8 @@
           <p class="mut">
             The ticked choices are starting points that you can change. They
             fill every lesson unless you set a sub-strand (the Methods button
-            below) or edit a single lesson. Textbook titles and page numbers
-            are always your own input.
+            below) or edit a single lesson. Textbook titles and page numbers are
+            always your own input.
           </p>
           <div class="mut">Assessment methods for all lessons</div>
           <div class="row" id="asAll"></div>
@@ -512,12 +512,23 @@
           </div>
           <details>
             <summary>Paste page numbers (one line per sub-strand)</summary>
-            <textarea id="pgPaste" placeholder="1.1.1: 12-15&#10;1.2.1: 16-19"></textarea>
-            <div class="row"><button id="pgApply">Apply pasted pages</button></div>
+            <textarea
+              id="pgPaste"
+              placeholder="1.1.1: 12-15&#10;1.2.1: 16-19"
+            ></textarea>
+            <div class="row">
+              <button id="pgApply">Apply pasted pages</button>
+            </div>
             <div class="mut" id="pgMsg"></div>
           </details>
           <div class="row">
-            <label>Other learning resources for all lessons (type your own)<input type="text" data-s="resText" maxlength="200" placeholder="e.g. counters, number cards"></label>
+            <label
+              >Other learning resources for all lessons (type your own)<input
+                type="text"
+                data-s="resText"
+                maxlength="200"
+                placeholder="e.g. counters, number cards"
+            /></label>
           </div>
           <details id="kicdRes">
             <summary>
@@ -550,55 +561,175 @@
     <script src="../js/scheme-edits.js"></script>
     <script>
       const D = [
-        ["1.1.1", 1, "Listening and Speaking", "Pronunciation and Listening", 3, 5, 7],
+        [
+          "1.1.1",
+          1,
+          "Listening and Speaking",
+          "Pronunciation and Listening",
+          3,
+          5,
+          7,
+        ],
         ["1.2.1", 1, "Reading", "Extensive Reading", 3, 4, 6],
         ["1.3.1", 1, "Grammar in Use", "Word Classes", 3, 3, 6],
         ["1.4.1", 1, "Writing", "Guided Writing", 3, 3, 5],
-        ["2.1.1", 2, "Listening and Speaking", "Pronunciation and Listening Comprehension", 3, 4, 5],
+        [
+          "2.1.1",
+          2,
+          "Listening and Speaking",
+          "Pronunciation and Listening Comprehension",
+          3,
+          4,
+          5,
+        ],
         ["2.2.1", 2, "Reading", "Intensive Reading", 3, 5, 7],
         ["2.3.1", 2, "Grammar in Use", "Word Classes", 3, 3, 6],
         ["2.4.1", 2, "Writing", "Creative Writing", 3, 4, 9],
-        ["3.1.1", 3, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 4, 6],
+        [
+          "3.1.1",
+          3,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
         ["3.2.1", 3, "Reading", "Intensive Reading", 3, 4, 6],
         ["3.3.1", 3, "Grammar in Use", "Correlative Conjunctions", 3, 4, 5],
         ["3.4.1", 3, "Writing", "Mechanics of Writing", 3, 4, 5],
-        ["4.1.1", 4, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 5, 10],
+        [
+          "4.1.1",
+          4,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          5,
+          10,
+        ],
         ["4.2.1", 4, "Reading", "Intensive Reading", 3, 4, 6],
         ["4.3.1", 4, "Grammar in Use", "Word Classes", 3, 3, 8],
         ["4.4.1", 4, "Writing", "Functional Writing", 3, 3, 8],
-        ["5.1.1", 5, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 4, 5],
+        [
+          "5.1.1",
+          5,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          5,
+        ],
         ["5.2.1", 5, "Reading", "Extensive Reading", 2, 3, 5],
         ["5.3.1", 5, "Grammar in Use", "Adjectives", 3, 3, 5],
         ["5.4.1", 5, "Writing", "Creative Writing", 3, 4, 5],
-        ["6.1.1", 6, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 4, 5],
+        [
+          "6.1.1",
+          6,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          5,
+        ],
         ["6.2.1", 6, "Reading", "Intensive Reading", 3, 4, 9],
         ["6.3.1", 6, "Grammar in Use", "Phrasal Quantifiers", 3, 3, 4],
         ["6.4.1", 6, "Writing", "Creative Writing", 3, 4, 7],
-        ["7.1.1", 7, "Listening and Speaking", "Pronunciation and Interactive Listening", 3, 5, 6],
+        [
+          "7.1.1",
+          7,
+          "Listening and Speaking",
+          "Pronunciation and Interactive Listening",
+          3,
+          5,
+          6,
+        ],
         ["7.2.1", 7, "Reading", "Extensive Reading", 2, 3, 7],
         ["7.3.1", 7, "Grammar in Use", "Tense", 3, 3, 5],
         ["7.4.1", 7, "Writing", "Mechanics of writing", 3, 3, 7],
-        ["8.1.1", 8, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 4, 6],
+        [
+          "8.1.1",
+          8,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
         ["8.2.1", 8, "Reading", "Fluency", 3, 4, 6],
         ["8.3.1", 8, "Grammar in Use", "Sentence Patterns", 3, 4, 6],
         ["8.4.1", 8, "Writing", "Creative Writing", 3, 4, 5],
-        ["9.1.1", 9, "Listening and Speaking", "Pronunciation and Speaking: Fluency", 3, 4, 8],
-        ["9.2.1", 9, "Reading", "Intensive Reading - Fictional and Non-fictional", 3, 4, 9],
+        [
+          "9.1.1",
+          9,
+          "Listening and Speaking",
+          "Pronunciation and Speaking: Fluency",
+          3,
+          4,
+          8,
+        ],
+        [
+          "9.2.1",
+          9,
+          "Reading",
+          "Intensive Reading - Fictional and Non-fictional",
+          3,
+          4,
+          9,
+        ],
         ["9.3.1", 9, "Grammar in Use", "Adverbs", 2, 3, 7],
         ["9.4.1", 9, "Writing", "Mechanics of writing", 3, 3, 7],
-        ["10.1.1", 10, "Listening and Speaking", "Pronunciation and Vocabulary: Interactive Listening", 3, 5, 6],
+        [
+          "10.1.1",
+          10,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary: Interactive Listening",
+          3,
+          5,
+          6,
+        ],
         ["10.2.1", 10, "Reading", "Intensive Reading", 3, 4, 6],
         ["10.3.1", 10, "Grammar in Use", "Conjunctions", 3, 3, 5],
         ["10.4.1", 10, "Writing", "Creative Writing", 2, 4, 6],
-        ["11.1.1", 11, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 4, 6],
-        ["11.2.1", 11, "Reading", "Intensive Reading: Digital Stories", 3, 4, 7],
+        [
+          "11.1.1",
+          11,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
+        [
+          "11.2.1",
+          11,
+          "Reading",
+          "Intensive Reading: Digital Stories",
+          3,
+          4,
+          7,
+        ],
         ["11.3.1", 11, "Grammar in Use", "Interrogatives", 3, 3, 5],
         ["11.4.1", 11, "Writing", "Mechanics of writing", 2, 3, 4],
-        ["12.1.1", 12, "Listening and Speaking", "Pronunciation and Vocabulary", 3, 4, 6],
+        [
+          "12.1.1",
+          12,
+          "Listening and Speaking",
+          "Pronunciation and Vocabulary",
+          3,
+          4,
+          6,
+        ],
         ["12.2.1", 12, "Reading", "Intensive Reading", 3, 4, 7],
         ["12.3.1", 12, "Grammar in Use", "Question Tags", 3, 4, 6],
         ["12.4.1", 12, "Writing", "Functional Writing", 3, 3, 6],
-        ["13.1.1", 13, "Listening and Speaking", "Pronunciation and Intensive Listening", 3, 4, 6],
+        [
+          "13.1.1",
+          13,
+          "Listening and Speaking",
+          "Pronunciation and Intensive Listening",
+          3,
+          4,
+          6,
+        ],
         ["13.2.1", 13, "Reading", "Extensive Reading", 2, 3, 7],
         ["13.3.1", 13, "Grammar in Use", "Word Classes", 3, 3, 6],
         ["13.4.1", 13, "Writing", "Mechanics of writing", 3, 4, 5],
@@ -739,43 +870,103 @@
       // (including "Portfolio dictation"). Until the importer stores each design's appendix, this list exists only for Grade 6 English.
       const KICD_STRAND_ASSESS = {
         listeningandspeaking: [
-          "oral reading or dictation recitations", "role play", "debates", "oral interviews", "dialogues",
-          "oral discussions", "oral presentations", "public speaking", "teacher-made tests", "peer assessment",
+          "oral reading or dictation recitations",
+          "role play",
+          "debates",
+          "oral interviews",
+          "dialogues",
+          "oral discussions",
+          "oral presentations",
+          "public speaking",
+          "teacher-made tests",
+          "peer assessment",
           "self-assessment and standardised listening tests",
         ],
         reading: [
-          "Reading aloud", "Dictation", "Oral interviews", "Question and answer", "Teacher-made tests",
-          "Learner summaries of what they read", "Learner journals", "Learner portfolios", "Peer assessment",
-          "Self-assessment and standardised reading tests", "Keeping a record of books read",
+          "Reading aloud",
+          "Dictation",
+          "Oral interviews",
+          "Question and answer",
+          "Teacher-made tests",
+          "Learner summaries of what they read",
+          "Learner journals",
+          "Learner portfolios",
+          "Peer assessment",
+          "Self-assessment and standardised reading tests",
+          "Keeping a record of books read",
         ],
         grammarinuse: [
-          "Tasks such as multiple choice", "Discrimination", "Gap-filling", "Short-answer",
-          "Dialogue-completion, information gap", "Role play", "Simulation", "Matching tasks",
-          "Substitution tables", "Word games", "Puzzles", "Teacher made tests",
+          "Tasks such as multiple choice",
+          "Discrimination",
+          "Gap-filling",
+          "Short-answer",
+          "Dialogue-completion, information gap",
+          "Role play",
+          "Simulation",
+          "Matching tasks",
+          "Substitution tables",
+          "Word games",
+          "Puzzles",
+          "Teacher made tests",
         ],
         writing: [
-          "Teacher-made tests", "Learner journals", "Peer assessment", "Self-assessment", "Portfolio dictation",
+          "Teacher-made tests",
+          "Learner journals",
+          "Peer assessment",
+          "Self-assessment",
+          "Portfolio dictation",
           "Standardised writing tests",
         ],
       };
       const KICD_RES_N = [
-        "course books", "story books", "poetry books", "pictures and photographs", "newspapers", "magazines",
-        "junior encyclopedia", "journals", "dictionaries", "diorama", "flash cards", "word wheels", "word puzzles",
-        "code words", "charts and realia",
+        "course books",
+        "story books",
+        "poetry books",
+        "pictures and photographs",
+        "newspapers",
+        "magazines",
+        "junior encyclopedia",
+        "journals",
+        "dictionaries",
+        "diorama",
+        "flash cards",
+        "word wheels",
+        "word puzzles",
+        "code words",
+        "charts and realia",
       ];
       const KICD_RES_D = [
-        "digital story books", "pictures and photographs", "journals", "electronic and digital devices",
-        "electronic or online dictionaries", "flash cards", "charts", "video clips", "audio-visual resources",
+        "digital story books",
+        "pictures and photographs",
+        "journals",
+        "electronic and digital devices",
+        "electronic or online dictionaries",
+        "flash cards",
+        "charts",
+        "video clips",
+        "audio-visual resources",
         "other web resources",
       ];
-      const COMMON_ASSESS = ["Observation", "Oral questions", "Written exercise", "Quiz", "Checklist", "Portfolio"];
-      const sk = (s) => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+      const COMMON_ASSESS = [
+        "Observation",
+        "Oral questions",
+        "Written exercise",
+        "Quiz",
+        "Checklist",
+        "Portfolio",
+      ];
+      const sk = (s) =>
+        String(s || "")
+          .toLowerCase()
+          .replace(/[^a-z]/g, "");
       const resLabel = (k) => {
         const g = k.slice(0, 1),
           t = k.slice(2);
         return g === "d" && KICD_RES_N.includes(t) ? t + " (digital)" : t;
       };
-      const RES_ORDER = KICD_RES_N.map((x) => "n:" + x).concat(KICD_RES_D.map((x) => "d:" + x));
+      const RES_ORDER = KICD_RES_N.map((x) => "n:" + x).concat(
+        KICD_RES_D.map((x) => "d:" + x),
+      );
       const tog = (arr, v, on, order) => {
         const i = arr.indexOf(v);
         if (on && i < 0) arr.push(v);
@@ -793,7 +984,11 @@
       const EMBED = D.map((x) => ({ ...x })); // the built-in Grade 6 English structure, used when signed out
       const hasKicd = () => st.bundleId === DEFAULT_BUNDLE; // the typed-in Appendix 3 lists belong to Grade 6 English only
       const srcNote = () =>
-        "Curriculum content: Kenya Institute of Curriculum Development (KICD), " + BMETA.grade + " " + BMETA.subject + " curriculum design. Not endorsed by KICD. The design gives a number of lessons per sub-strand but does not say which outcome or activity belongs to which lesson, so EduKitPrime divides them evenly across the lessons; adjust as needed.";
+        "Curriculum content: Kenya Institute of Curriculum Development (KICD), " +
+        BMETA.grade +
+        " " +
+        BMETA.subject +
+        " curriculum design. Not endorsed by KICD. The design gives a number of lessons per sub-strand but does not say which outcome or activity belongs to which lesson, so EduKitPrime divides them evenly across the lessons; adjust as needed.";
       const appxNote = () =>
         hasKicd()
           ? "Assessment methods and learning resources are chosen by the teacher. The suggested lists come from Appendix 3 of the KICD Grade 6 English curriculum design (not endorsed by KICD)."
@@ -837,7 +1032,10 @@
           groups[th] =
             pd.theme && pd.theme.title
               ? "Theme " + th + ": " + clean(pd.theme.title)
-              : /^strand-/.test(ids[i]) && first && first.strand && first.strand.name
+              : /^strand-/.test(ids[i]) &&
+                  first &&
+                  first.strand &&
+                  first.strand.name
                 ? "Strand: " + clean(first.strand.name)
                 : "Theme " + th;
           (pd.subStrands || []).forEach((x) => {
@@ -848,7 +1046,10 @@
               id: x.id,
               t: th,
               s: (x.strand && x.strand.name) || "",
-              n: x.name,
+              n:
+                /:\s*$/.test(clean(x.name)) && (x.topics || [])[0]
+                  ? clean(x.name) + " " + clean(x.topics[0])
+                  : x.name,
               l: x.lessons || 0,
               o: outs.length,
               e: exps.length,
@@ -869,12 +1070,20 @@
       // The list of subjects a signed-in teacher can choose from (bundles marked active).
       async function loadCatalogue(db, fs) {
         const q = await fs.getDocs(
-          fs.query(fs.collection(db, "curriculumBundles"), fs.where("status", "==", "active")),
+          fs.query(
+            fs.collection(db, "curriculumBundles"),
+            fs.where("status", "==", "active"),
+          ),
         );
         const out = [];
         q.forEach((d) => {
           const b = d.data();
-          out.push({ id: d.id, grade: b.grade, subject: b.subject, reviewStatus: b.reviewStatus || null });
+          out.push({
+            id: d.id,
+            grade: b.grade,
+            subject: b.subject,
+            reviewStatus: b.reviewStatus || null,
+          });
         });
         return out;
       }
@@ -915,11 +1124,20 @@
         fillSelects();
         CUR = embedded
           ? { state: "none" }
-          : { state: "loaded", status: r.bundle.reviewStatus || "unknown", bundleId: r.bundle.bundleId };
+          : {
+              state: "loaded",
+              status: r.bundle.reviewStatus || "unknown",
+              bundleId: r.bundle.bundleId,
+            };
       }
       const restoreEmbedded = () =>
         applyBundle(
-          { rows: EMBED.map((x) => ({ ...x })), content: {}, groups: {}, bundle: { grade: "Grade 6", subject: "English" } },
+          {
+            rows: EMBED.map((x) => ({ ...x })),
+            content: {},
+            groups: {},
+            bundle: { grade: "Grade 6", subject: "English" },
+          },
           true,
         );
       function renderCur() {
@@ -927,9 +1145,15 @@
         if (!e) return;
         e.textContent =
           CUR.state === "loaded"
-            ? "Curriculum: " + BMETA.grade + " " + BMETA.subject + " loaded from the database. Review status: " +
+            ? "Curriculum: " +
+              BMETA.grade +
+              " " +
+              BMETA.subject +
+              " loaded from the database. Review status: " +
               CUR.status +
-              (CUR.status === "auto-checked" ? " (checked by script, not compared by hand)" : "") +
+              (CUR.status === "auto-checked"
+                ? " (checked by script, not compared by hand)"
+                : "") +
               "."
             : CUR.state === "error"
               ? "The curriculum text could not be loaded (" +
@@ -1049,7 +1273,17 @@
           this.keys("ekp:s:").forEach((k) => {
             try {
               const o = JSON.parse(this.get(k));
-              out.push({ id: k.slice(6), title: [o.cls, o.subject, o.term, o.year].filter(Boolean).join(" "), bundleId: o.bundleId, year: o.year, term: o.term, version: o.version || 0, updatedAt: o.updatedAt || "" });
+              out.push({
+                id: k.slice(6),
+                title: [o.cls, o.subject, o.term, o.year]
+                  .filter(Boolean)
+                  .join(" "),
+                bundleId: o.bundleId,
+                year: o.year,
+                term: o.term,
+                version: o.version || 0,
+                updatedAt: o.updatedAt || "",
+              });
             } catch (e) {}
           });
           return out;
@@ -1167,18 +1401,32 @@
       }
       // One saved scheme per class, subject, year and term: its id is built from those four.
       const draftIdFor = (bundleId, year, term) =>
-        String(bundleId).replace(/^ke-cbe_/, "") + "-" + year + "-t" + String(term).slice(-1);
+        String(bundleId).replace(/^ke-cbe_/, "") +
+        "-" +
+        year +
+        "-t" +
+        String(term).slice(-1);
       const draftId = () => draftIdFor(st.bundleId, st.year, st.term);
-      const byNewest = (a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+      const byNewest = (a, b) =>
+        String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
       function resetPlan() {
         Object.assign(st, {
-          plan: "continue", mode: "squeeze", fromLesson: 1, prio: {}, lock: {}, skip: {}, zero: {}, assessSub: {},
-          from: D[0] ? D[0].id : "", to: D.length ? D[D.length - 1].id : "",
+          plan: "continue",
+          mode: "squeeze",
+          fromLesson: 1,
+          prio: {},
+          lock: {},
+          skip: {},
+          zero: {},
+          assessSub: {},
+          from: D[0] ? D[0].id : "",
+          to: D.length ? D[D.length - 1].id : "",
         });
       }
       async function ensureBundle(id) {
         if (!user) {
-          if (id !== DEFAULT_BUNDLE) throw new Error("sign in to open this subject");
+          if (id !== DEFAULT_BUNDLE)
+            throw new Error("sign in to open this subject");
           restoreEmbedded();
           return;
         }
@@ -1204,13 +1452,33 @@
         const carried = {};
         try {
           np = nextPoint(compute());
-          ["prio", "lock", "skip", "zero", "mode"].forEach((k) => (carried[k] = JSON.parse(JSON.stringify(st[k] || {}))));
+          ["prio", "lock", "skip", "zero", "mode"].forEach(
+            (k) => (carried[k] = JSON.parse(JSON.stringify(st[k] || {}))),
+          );
           carried.mode = st.mode;
         } catch (e) {}
         SETTINGS.forEach((k) => (st[k] = snapshot[k]));
-        if (np) Object.assign(st, carried, { plan: "continue", from: np.id, fromLesson: np.lesson, continuesFrom: prevId });
+        if (np)
+          Object.assign(st, carried, {
+            plan: "continue",
+            from: np.id,
+            fromLesson: np.lesson,
+            continuesFrom: prevId,
+          });
       }
-      const CARRY = ["school", "teacher", "pat", "styles", "ai", "assessAll", "resAll", "resText", "openWeek", "closeWeeks", "breakFirstDay"];
+      const CARRY = [
+        "school",
+        "teacher",
+        "pat",
+        "styles",
+        "ai",
+        "assessAll",
+        "resAll",
+        "resText",
+        "openWeek",
+        "closeWeeks",
+        "breakFirstDay",
+      ];
       async function startNew(prev, sameBundle) {
         resetPlan();
         st.cls = BMETA.grade;
@@ -1237,7 +1505,10 @@
             CUR = { state: "error", msg };
           } else {
             restoreEmbedded();
-            problem = "That scheme needs a signed-in account (" + msg + "). Showing Grade 6 English instead.";
+            problem =
+              "That scheme needs a signed-in account (" +
+              msg +
+              "). Showing Grade 6 English instead.";
             st.bundleId = DEFAULT_BUNDLE;
             st.id = draftId();
             await boot();
@@ -1271,7 +1542,12 @@
       async function switchTo(ch) {
         if (switching) return;
         switching = true;
-        const old = { id: st.id, bundleId: st.bundleId, year: st.year, term: st.term };
+        const old = {
+          id: st.id,
+          bundleId: st.bundleId,
+          year: st.year,
+          term: st.term,
+        };
         try {
           await saveQ;
           const prev = JSON.parse(JSON.stringify(st));
@@ -1293,7 +1569,9 @@
             await ensureBundle(st.bundleId);
           } catch (e) {
             Object.assign(st, old);
-            problem = "Could not open that: " + ((e && (e.code || e.message)) || "unknown error");
+            problem =
+              "Could not open that: " +
+              ((e && (e.code || e.message)) || "unknown error");
             return;
           }
           const sameBundle = st.bundleId === old.bundleId;
@@ -1317,10 +1595,19 @@
         return /pre/i.test(g) ? (m ? +m[0] / 10 - 1 : -1) : m ? +m[0] : 99;
       };
       function renderChooser() {
-        const list = CATALOG.length ? CATALOG : [{ id: DEFAULT_BUNDLE, grade: "Grade 6", subject: "English" }];
-        const grades = [...new Set(list.map((b) => b.grade))].sort((a, b) => gradeNo(a) - gradeNo(b));
+        const list = CATALOG.length
+          ? CATALOG
+          : [{ id: DEFAULT_BUNDLE, grade: "Grade 6", subject: "English" }];
+        const grades = [...new Set(list.map((b) => b.grade))].sort(
+          (a, b) => gradeNo(a) - gradeNo(b),
+        );
         const cur = list.find((b) => b.id === st.bundleId) || list[0];
-        $("selGrade").innerHTML = grades.map((g) => `<option ${g === cur.grade ? "selected" : ""}>${esc(g)}</option>`).join("");
+        $("selGrade").innerHTML = grades
+          .map(
+            (g) =>
+              `<option ${g === cur.grade ? "selected" : ""}>${esc(g)}</option>`,
+          )
+          .join("");
         $("selSubject").innerHTML = list
           .filter((b) => b.grade === cur.grade)
           .sort((a, b) => String(a.subject).localeCompare(b.subject))
@@ -1330,18 +1617,27 @@
           )
           .join("");
         $("chmsg").textContent = user
-          ? CATALOG.length ? "" : "No subjects were found in the database."
+          ? CATALOG.length
+            ? ""
+            : "No subjects were found in the database."
           : "Sign in to choose other classes and subjects.";
       }
       function chooserChanged(id) {
         const list = CATALOG.length ? CATALOG : [];
-        if (id === "selSubject") return switchTo({ bundleId: $("selSubject").value });
-        const first = list.filter((b) => b.grade === $("selGrade").value).sort((a, b) => String(a.subject).localeCompare(b.subject))[0];
+        if (id === "selSubject")
+          return switchTo({ bundleId: $("selSubject").value });
+        const first = list
+          .filter((b) => b.grade === $("selGrade").value)
+          .sort((a, b) => String(a.subject).localeCompare(b.subject))[0];
         if (first) switchTo({ bundleId: first.id });
       }
       const bundleLabel = (id) => {
         const b = CATALOG.find((x) => x.id === id);
-        return b ? b.grade + " " + b.subject : id === DEFAULT_BUNDLE || !id ? "Grade 6 English" : String(id);
+        return b
+          ? b.grade + " " + b.subject
+          : id === DEFAULT_BUNDLE || !id
+            ? "Grade 6 English"
+            : String(id);
       };
       async function refreshMine() {
         let list = [];
@@ -1365,14 +1661,22 @@
           .value.split(/\r?\n/)
           .forEach((line) => {
             if (!line.trim()) return;
-            const m = line.match(/^\s*(\d+(?:\.\d+)+(?:-[a-z])?)[\s:=]+(.+?)\s*$/);
+            const m = line.match(
+              /^\s*(\d+(?:\.\d+)+(?:-[a-z])?)[\s:=]+(.+?)\s*$/,
+            );
             if (m && /\d/.test(m[2]) && D.some((u) => u.id === m[1])) {
               st.pages[m[1]] = clean(m[2]).slice(0, 40);
               ok++;
             } else bad.push(line.trim().slice(0, 30));
           });
         $("pgMsg").textContent =
-          ok + " sub-strand(s) updated." + (bad.length ? " Not recognised: " + bad.slice(0, 5).join(" | ") + (bad.length > 5 ? " ..." : "") : "");
+          ok +
+          " sub-strand(s) updated." +
+          (bad.length
+            ? " Not recognised: " +
+              bad.slice(0, 5).join(" | ") +
+              (bad.length > 5 ? " ..." : "")
+            : "");
         renderAdjust();
       }
       async function initCloud() {
@@ -1398,7 +1702,9 @@
           user = u;
           if (u) {
             try {
-              const up = M ? { ensureUserProfile: async () => {} } : await import(new URL(PATHS.profile, location.href).href);
+              const up = M
+                ? { ensureUserProfile: async () => {} }
+                : await import(new URL(PATHS.profile, location.href).href);
               await up.ensureUserProfile(u);
             } catch (e) {}
             try {
@@ -1406,7 +1712,9 @@
             } catch (e) {
               CATALOG = [];
             }
-            await useStore(SM.createCloudStore({ db: FB.db, uid: u.uid, fs: FS }));
+            await useStore(
+              SM.createCloudStore({ db: FB.db, uid: u.uid, fs: FS }),
+            );
           } else {
             CATALOG = [];
             await useStore(LocalStore);
@@ -1455,7 +1763,8 @@
         return new Promise((resolve, reject) => {
           let i = 0;
           const next = () => {
-            if (i >= DOCX_URLS.length) return reject(new Error("could not load the Word library"));
+            if (i >= DOCX_URLS.length)
+              return reject(new Error("could not load the Word library"));
             const sc = document.createElement("script");
             sc.src = DOCX_URLS[i++];
             sc.onload = () => (window.docx ? resolve(window.docx) : next());
@@ -1476,34 +1785,81 @@
           b.insertAdjacentText("beforebegin", "\n");
           b.insertAdjacentText("afterend", "\n");
         });
-        return c.textContent.split("\n").map((l) => l.replace(/\s+$/, "")).filter((l) => l.trim());
+        return c.textContent
+          .split("\n")
+          .map((l) => l.replace(/\s+$/, ""))
+          .filter((l) => l.trim());
       }
       async function dlDocx() {
         let X;
         try {
           X = await loadDocx();
         } catch (e) {
-          problem = "The Word library could not be loaded (check your connection), so a basic file was made instead.";
+          problem =
+            "The Word library could not be loaded (check your connection), so a basic file was made instead.";
           renderBar();
           return dlWord();
         }
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, PageOrientation, ShadingType, Footer, PageNumber } = X;
+        const {
+          Document,
+          Packer,
+          Paragraph,
+          TextRun,
+          Table,
+          TableRow,
+          TableCell,
+          WidthType,
+          AlignmentType,
+          PageOrientation,
+          ShadingType,
+          Footer,
+          PageNumber,
+        } = X;
         const W = [500, 800, 1100, 1500, 2800, 3000, 1600, 1400, 1400, 1298]; // twips; adds up to the width between 0.5 inch margins on landscape A4
         const FONT = "Arial";
-        const run = (text, o = {}) => new TextRun({ text, size: o.size || 16, bold: !!o.bold, italics: !!o.italics, color: o.color, font: FONT });
-        const para = (text, o = {}) => new Paragraph({ children: [run(text, o)], alignment: o.align, spacing: { before: 0, after: o.after || 0 } });
+        const run = (text, o = {}) =>
+          new TextRun({
+            text,
+            size: o.size || 16,
+            bold: !!o.bold,
+            italics: !!o.italics,
+            color: o.color,
+            font: FONT,
+          });
+        const para = (text, o = {}) =>
+          new Paragraph({
+            children: [run(text, o)],
+            alignment: o.align,
+            spacing: { before: 0, after: o.after || 0 },
+          });
         const cell = (lines, span, from, o = {}) =>
           new TableCell({
             columnSpan: span,
-            width: { size: W.slice(from, from + span).reduce((a, b) => a + b, 0), type: WidthType.DXA },
-            shading: o.fill ? { type: ShadingType.CLEAR, color: "auto", fill: o.fill } : undefined,
+            width: {
+              size: W.slice(from, from + span).reduce((a, b) => a + b, 0),
+              type: WidthType.DXA,
+            },
+            shading: o.fill
+              ? { type: ShadingType.CLEAR, color: "auto", fill: o.fill }
+              : undefined,
             margins: { top: 40, bottom: 40, left: 60, right: 60 },
             children: (lines.length ? lines : [""]).map((l) => para(l, o)),
           });
         const root = document.querySelector("#scheme table.doc");
-        const headCells = [...root.querySelectorAll("thead tr:nth-child(2) th")];
+        const headCells = [
+          ...root.querySelectorAll("thead tr:nth-child(2) th"),
+        ];
         const rows = [
-          new TableRow({ tableHeader: true, cantSplit: true, children: headCells.map((th, i) => cell([th.textContent.trim()], 1, i, { bold: true, fill: "E8E8E8" })) }),
+          new TableRow({
+            tableHeader: true,
+            cantSplit: true,
+            children: headCells.map((th, i) =>
+              cell([th.textContent.trim()], 1, i, {
+                bold: true,
+                fill: "E8E8E8",
+              }),
+            ),
+          }),
         ];
         root.querySelectorAll("tbody tr").forEach((tr) => {
           let col = 0;
@@ -1511,33 +1867,90 @@
           const kids = [...tr.cells].map((td) => {
             const span = td.colSpan || 1,
               style = { fill: spec ? "F0F0F0" : undefined };
-            if (td.classList.contains("ph")) Object.assign(style, { italics: true, color: "666666" });
-            if (td.classList.contains("mut")) Object.assign(style, { italics: true, color: "555555", size: 14 });
-            if (spec && span > 1) Object.assign(style, { bold: true, align: AlignmentType.CENTER });
+            if (td.classList.contains("ph"))
+              Object.assign(style, { italics: true, color: "666666" });
+            if (td.classList.contains("mut"))
+              Object.assign(style, {
+                italics: true,
+                color: "555555",
+                size: 14,
+              });
+            if (spec && span > 1)
+              Object.assign(style, { bold: true, align: AlignmentType.CENTER });
             const c = cell(cellLines(td), span, col, style);
             col += span;
             return c;
           });
           rows.push(new TableRow({ cantSplit: true, children: kids }));
         });
-        const table = new Table({ width: { size: W.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: W, rows });
-        const top = [para($("hd").textContent, { bold: true, size: 22, after: 60 }), para($("hi").textContent, { size: 16, after: 120 })];
-        const sign = ["Prepared by (teacher): signature and date", "Checked by (HOD or deputy): signature and date", "Approved by (head teacher): signature and date"].map(
-          (t) => new Paragraph({ children: [run(t)], spacing: { before: 360, after: 0 }, border: { top: { style: "single", size: 6, color: "000000", space: 2 } } }),
+        const table = new Table({
+          width: { size: W.reduce((a, b) => a + b, 0), type: WidthType.DXA },
+          columnWidths: W,
+          rows,
+        });
+        const top = [
+          para($("hd").textContent, { bold: true, size: 22, after: 60 }),
+          para($("hi").textContent, { size: 16, after: 120 }),
+        ];
+        const sign = [
+          "Prepared by (teacher): signature and date",
+          "Checked by (HOD or deputy): signature and date",
+          "Approved by (head teacher): signature and date",
+        ].map(
+          (t) =>
+            new Paragraph({
+              children: [run(t)],
+              spacing: { before: 360, after: 0 },
+              border: {
+                top: { style: "single", size: 6, color: "000000", space: 2 },
+              },
+            }),
         );
         const doc = new Document({
           creator: "EduKitPrime",
           title: "Scheme of work",
           sections: [
             {
-              properties: { page: { size: { width: 11906, height: 16838, orientation: PageOrientation.LANDSCAPE }, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
-              footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: ["Page ", PageNumber.CURRENT, " of ", PageNumber.TOTAL_PAGES], size: 16, font: FONT })] })] }) },
+              properties: {
+                page: {
+                  size: {
+                    width: 11906,
+                    height: 16838,
+                    orientation: PageOrientation.LANDSCAPE,
+                  },
+                  margin: { top: 720, bottom: 720, left: 720, right: 720 },
+                },
+              },
+              footers: {
+                default: new Footer({
+                  children: [
+                    new Paragraph({
+                      alignment: AlignmentType.CENTER,
+                      children: [
+                        new TextRun({
+                          children: [
+                            "Page ",
+                            PageNumber.CURRENT,
+                            " of ",
+                            PageNumber.TOTAL_PAGES,
+                          ],
+                          size: 16,
+                          font: FONT,
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              },
               children: [...top, table, ...sign],
             },
           ],
         });
         const blob = await Packer.toBlob(doc),
-          name = [st.cls, st.subject, st.term, st.year].join("-").replace(/[^A-Za-z0-9]+/g, "-") + ".docx";
+          name =
+            [st.cls, st.subject, st.term, st.year]
+              .join("-")
+              .replace(/[^A-Za-z0-9]+/g, "-") + ".docx";
         if (window.__EKP_DOWNLOAD) return window.__EKP_DOWNLOAD(name, blob);
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -1624,15 +2037,22 @@
       };
       // Official calendar: Ministry of Education circular MOE.HQS/3/13/3 Vol III, 19 October 2026 (pre-primary, primary and junior schools).
       // Half-term dates are copied as listed. Stopgap: this moves to Firestore (academicCalendars/{year}, admin-written) later.
-      const CIRC = "Ministry of Education circular MOE.HQS/3/13/3 Vol III, 19 Oct 2026";
+      const CIRC =
+        "Ministry of Education circular MOE.HQS/3/13/3 Vol III, 19 Oct 2026";
       const CAL = {
         "2027|Term 1": {
           start: "2027-01-04",
           end: "2027-04-09",
           src: CIRC,
-          breaks: [{ from: "2027-02-19", to: "2027-02-28", reason: "Half term" }],
+          breaks: [
+            { from: "2027-02-19", to: "2027-02-28", reason: "Half term" },
+          ],
           holidays: [
-            { date: "2027-03-10", name: "Idd-ul-Fitr", note: "expected date: set by moon sighting, confirm when gazetted" },
+            {
+              date: "2027-03-10",
+              name: "Idd-ul-Fitr",
+              note: "expected date: set by moon sighting, confirm when gazetted",
+            },
             { date: "2027-03-26", name: "Good Friday", note: "" },
             { date: "2027-03-29", name: "Easter Monday", note: "" },
           ],
@@ -1641,9 +2061,15 @@
           start: "2027-05-03",
           end: "2027-07-30",
           src: CIRC,
-          breaks: [{ from: "2027-06-09", to: "2027-06-20", reason: "Half term" }],
+          breaks: [
+            { from: "2027-06-09", to: "2027-06-20", reason: "Half term" },
+          ],
           holidays: [
-            { date: "2027-05-17", name: "Idd-ul-Azha", note: "expected date: set by moon sighting, confirm when gazetted" },
+            {
+              date: "2027-05-17",
+              name: "Idd-ul-Azha",
+              note: "expected date: set by moon sighting, confirm when gazetted",
+            },
             { date: "2027-06-01", name: "Madaraka Day", note: "" },
           ],
         },
@@ -1653,7 +2079,11 @@
           src: CIRC,
           breaks: [],
           holidays: [
-            { date: "2027-10-11", name: "Mazingira Day (observed)", note: "10 October is a Sunday, so Monday is observed" },
+            {
+              date: "2027-10-11",
+              name: "Mazingira Day (observed)",
+              note: "10 October is a Sunday, so Monday is observed",
+            },
             { date: "2027-10-20", name: "Mashujaa Day", note: "" },
           ],
         },
@@ -1726,7 +2156,8 @@
         holidayWork: {},
       };
       const DEFAULTS = JSON.stringify(st);
-      const resetState = () => Object.assign(st, JSON.parse(DEFAULTS), { wallet: st.wallet });
+      const resetState = () =>
+        Object.assign(st, JSON.parse(DEFAULTS), { wallet: st.wallet });
       function loadCal() {
         const c = CAL[st.year + "|" + st.term];
         st.blocked = st.blocked.filter((b) => !b.official);
@@ -1736,7 +2167,12 @@
           st.src = c.src;
           st.loaded = c;
           c.breaks.forEach((b) =>
-            st.blocked.push({ from: b.from, to: b.to, reason: b.reason, official: true }),
+            st.blocked.push({
+              from: b.from,
+              to: b.to,
+              reason: b.reason,
+              official: true,
+            }),
           );
         } else {
           st.loaded = null;
@@ -1755,9 +2191,17 @@
           atClose = !st.loaded || st.end === st.loaded.end,
           n = Math.max(0, Math.min(2, parseInt(st.closeWeeks) || 0));
         if (st.openWeek && atOpen)
-          out.push({ from: st.start, to: iso(Math.min(e, mon(s) + 6 * DAY)), reason: "OPENING/PREPARATION" });
+          out.push({
+            from: st.start,
+            to: iso(Math.min(e, mon(s) + 6 * DAY)),
+            reason: "OPENING/PREPARATION",
+          });
         if (n && atClose)
-          out.push({ from: iso(Math.max(s, mon(e) - (n - 1) * 7 * DAY)), to: st.end, reason: "END TERM ASSESSMENT/CLOSING" });
+          out.push({
+            from: iso(Math.max(s, mon(e) - (n - 1) * 7 * DAY)),
+            to: st.end,
+            reason: "END TERM ASSESSMENT/CLOSING",
+          });
         return out;
       }
       // Official break dates are copied as the circular lists them. Many public day schools teach on the first listed day, so by default
@@ -1786,33 +2230,69 @@
       ];
       const LBL_EN = {
         title: "SCHEME OF WORK",
-        cols: ["Wk", "LSN", "Strand", "Sub-strand", "Specific learning outcomes", "Learning experiences", "Key inquiry question(s)", "Learning resources", "Assessment methods", "Reflection"],
-        sp: { open: "OPENING/PREPARATION", half: "HALF TERM", close: "END TERM ASSESSMENT/CLOSING" },
+        cols: [
+          "Wk",
+          "LSN",
+          "Strand",
+          "Sub-strand",
+          "Specific learning outcomes",
+          "Learning experiences",
+          "Key inquiry question(s)",
+          "Learning resources",
+          "Assessment methods",
+          "Reflection",
+        ],
+        sp: {
+          open: "OPENING/PREPARATION",
+          half: "HALF TERM",
+          close: "END TERM ASSESSMENT/CLOSING",
+        },
       };
       // Kiswahili column headings follow the Kiswahili curriculum design and the sample Kiswahili scheme; the three banner rows are
       // my wording and should be checked by a Kiswahili teacher.
       const LBL_SW = {
         title: "AZIMIO LA KAZI",
-        cols: ["Wiki", "Kipindi", "Mada", "Mada ndogo", "Matokeo maalum yanayotarajiwa", "Shughuli za ujifunzaji zilizopendekezwa", "Swali dadisi lililopendekezwa", "Nyenzo", "Mapendekezo ya tathmini", "Maoni"],
-        sp: { open: "KUFUNGUA SHULE / MAANDALIZI", half: "LIKIZO FUPI YA MUHULA", close: "TATHMINI YA MWISHO WA MUHULA / KUFUNGA SHULE" },
+        cols: [
+          "Wiki",
+          "Kipindi",
+          "Mada",
+          "Mada ndogo",
+          "Matokeo maalum yanayotarajiwa",
+          "Shughuli za ujifunzaji zilizopendekezwa",
+          "Swali dadisi lililopendekezwa",
+          "Nyenzo",
+          "Mapendekezo ya tathmini",
+          "Maoni",
+        ],
+        sp: {
+          open: "KUFUNGUA SHULE / MAANDALIZI",
+          half: "LIKIZO FUPI YA MUHULA",
+          close: "TATHMINI YA MWISHO WA MUHULA / KUFUNGA SHULE",
+        },
       };
       const LBL = () => (BMETA.subject === "Kiswahili" ? LBL_SW : LBL_EN);
       function specialLabel(ds) {
-        const rs = [...new Set(ds.filter((d) => d.reason).map((d) => d.reason))];
+        const rs = [
+          ...new Set(ds.filter((d) => d.reason).map((d) => d.reason)),
+        ];
         if (rs.length !== 1) return "";
         const m = SPECIAL.find((x) => x[0].test(rs[0]));
         return m ? m[1] : "";
       }
       // Text for the two columns that used to be placeholders. A lesson edit beats these; a sub-strand setting beats the scheme-wide choice.
       const asText = (id) =>
-        ((Array.isArray(st.assessSub[id]) ? st.assessSub[id] : st.assessAll) || []).join("; ");
+        (
+          (Array.isArray(st.assessSub[id]) ? st.assessSub[id] : st.assessAll) ||
+          []
+        ).join("; ");
       function resText(id) {
         const parts = [],
           book = clean(st.book),
           pg = clean(id && st.pages[id]).replace(/^pgs?\.?\s*/i, "");
         if (pg) parts.push((book ? book + ", " : "") + "pg. " + pg);
         else if (book) parts.push(book);
-        if (hasKicd()) (st.resAll || []).forEach((k) => parts.push(resLabel(k)));
+        if (hasKicd())
+          (st.resAll || []).forEach((k) => parts.push(resLabel(k)));
         if (clean(st.resText)) parts.push(clean(st.resText));
         return parts.join("; ");
       }
@@ -1864,7 +2344,12 @@
           chip("data-ra", "n:" + x, x, st.resAll.includes("n:" + x)),
         ).join("");
         $("resD").innerHTML = KICD_RES_D.map((x) =>
-          chip("data-ra", "d:" + x, resLabel("d:" + x), st.resAll.includes("d:" + x)),
+          chip(
+            "data-ra",
+            "d:" + x,
+            resLabel("d:" + x),
+            st.resAll.includes("d:" + x),
+          ),
         ).join("");
       }
       function compute() {
@@ -1890,7 +2375,11 @@
             lock: st.lock[u.id] ?? null,
           }));
         const special = specialBlocks(),
-          cal = buildCalendar(st.start, st.end, st.pat, [...special, ...effBlocks(), ...holidayBlocks()]);
+          cal = buildCalendar(st.start, st.end, st.pat, [
+            ...special,
+            ...effBlocks(),
+            ...holidayBlocks(),
+          ]);
         if (range) {
           const r = allocate(units, cal.slots.length, st.mode);
           return {
@@ -2248,7 +2737,9 @@
       function openAssess(id) {
         const u = D.find((x) => x.id === id);
         if (!u) return;
-        const cur = Array.isArray(st.assessSub[id]) ? st.assessSub[id] : st.assessAll,
+        const cur = Array.isArray(st.assessSub[id])
+            ? st.assessSub[id]
+            : st.assessAll,
           kic = hasKicd() ? KICD_STRAND_ASSESS[sk(u.s)] || [] : [],
           box = (m) =>
             `<label style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" data-ac="${esc(m)}" ${cur.includes(m) ? "checked" : ""}> ${esc(m)}</label>`;
@@ -2350,7 +2841,9 @@
 <div class="row noprint"><label>School<input type="text" data-h="school" value="${esc(st.school)}"></label><label>Teacher<input type="text" data-h="teacher" value="${esc(st.teacher)}"></label><label>Class<input type="text" data-h="cls" value="${esc(st.cls)}"></label></div>
 <p class="mut noprint">Demo: grey italic cells are placeholders. Use Edit on any lesson to add your own text. The Reflection column stays for you to fill.</p>
 <div class="scroll"><table class="doc"><thead><tr><td colspan="10" class="tt"><b id="hd"></b><div id="hi" class="mut"></div></td></tr>
-<tr>${LBL().cols.map((c) => "<th>" + esc(c) + "</th>").join("")}</tr></thead><tbody>${body}</tbody></table></div>
+<tr>${LBL()
+            .cols.map((c) => "<th>" + esc(c) + "</th>")
+            .join("")}</tr></thead><tbody>${body}</tbody></table></div>
 <div class="sig"><div>Prepared by (teacher): signature and date</div><div>Checked by (HOD or deputy): signature and date</div><div>Approved by (head teacher): signature and date</div></div></section>`;
         hd();
         renderEdits(c);
@@ -2490,6 +2983,7 @@
           st.plan = "continue";
           st.from = D[0] ? D[0].id : st.from;
           st.fromLesson = 1;
+          loadCal();
           sync();
           renderAdjust();
         } else if (id === "p2") {
